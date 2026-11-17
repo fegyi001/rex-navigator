@@ -60,7 +60,7 @@ test("locked Lua transactions retain their inode and release after success or er
   let r = run();
   assert.equal(r.status, 0, r.stderr);
   assert.equal(JSON.parse(r.stdout).count, 1);
-  const lock = join(f.home, "config/rex/state/session-history.lock");
+  const lock = join(f.home, "plugin/state/session-history.lock");
   const inode = statSync(lock).ino;
   r = run({ fail: true });
   assert.equal(r.status, 1);
@@ -102,16 +102,17 @@ test("explicit transaction lock waits are capped at twenty seconds", (t) => {
   const f = createLuaFixture(t);
   const r = f.run(script, { probe: "lock-arguments" });
   assert.equal(r.status, 0, r.stderr);
-  assert.deepEqual(JSON.parse(r.stdout), { wait: "20", lock: join(f.home, "config/rex/state/session-history.lock") });
+  assert.deepEqual(JSON.parse(r.stdout), { wait: "20", lock: join(f.home, "plugin/state/session-history.lock") });
 });
 
-test("empty XDG variables use home defaults instead of absolute root paths", (t) => {
+test("history and its lock follow a quoted plugin root while an empty XDG registry uses home defaults", (t) => {
   const f = createLuaFixture(t);
-  const r = f.run(script, { probe: "empty-xdg" }, { XDG_CONFIG_HOME: "", XDG_STATE_HOME: "" });
+  const plugin = join(f.home, "relocated ' café\nplugin");
+  const r = f.run(script, { probe: "empty-xdg", code_root: plugin }, { XDG_CONFIG_HOME: "", XDG_STATE_HOME: "" });
   assert.equal(r.status, 0, r.stderr);
   assert.deepEqual(JSON.parse(r.stdout), {
-    history: join(f.home, ".config/rex/state/session-history.json"), registry: join(f.home, ".local/state/rex/project-sessions.json"),
-    lock: join(f.home, ".config/rex/state/session-history.lock"),
+    history: join(plugin, "state/session-history.json"), registry: join(f.home, ".local/state/rex/project-sessions.json"),
+    lock: join(plugin, "state/session-history.lock"),
   });
 });
 
@@ -135,7 +136,7 @@ for (const signal of ["SIGTERM", "SIGKILL"]) {
     await delay(200);
     let alive;
     try { process.kill(worker, 0); alive = true; } catch { alive = false; }
-    const contender = spawnSync("/usr/bin/lockf", ["-k", "-s", "-t", "0", join(f.home, "config/rex/state/session-history.lock"), "/usr/bin/true"]);
+    const contender = spawnSync("/usr/bin/lockf", ["-k", "-s", "-t", "0", join(f.home, "plugin/state/session-history.lock"), "/usr/bin/true"]);
     assert.ok(!alive || contender.status === 75, `workerAlive=${alive}; contender=${contender.status}`);
   });
 }

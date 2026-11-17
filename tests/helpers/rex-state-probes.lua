@@ -1,5 +1,5 @@
 local json = require("lua.navigation.json")
-local R = require("lua.navigation.runtime").new({ root = rex.args.root, host = rex })
+local R = require("lua.navigation.runtime").new({ root = rex.args.code_root or rex.args.root, host = rex })
 
 if rex.args.probe == "json" then
   assert(json.is_object(json.decode("{}")))

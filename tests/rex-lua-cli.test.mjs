@@ -69,7 +69,7 @@ test("canceling a session picker leaves state untouched and displays no ID suffi
   const result = f.run("session", ["pick", "--client", "client:mac", "--current", "session:a"]);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(readFileSync(join(f.home, "picker-records"), "utf8"), "session:b\tBeta\0");
-  assert.equal(existsSync(join(f.home, "config/rex/state/session-history.json")), false);
+  assert.equal(existsSync(join(f.home, "plugin/state/session-history.json")), false);
 });
 
 test("floating picker errors remain visible until Enter", (t) => {
@@ -88,8 +88,8 @@ test("a relocated quoted/newline code root remains independent of cwd and Node",
   const result = spawnSync("/bin/sh", [join(plugin, "scripts/session-picker.sh"), "select", "--client", "client:mac", "--current", "session:a", "--session", "session:b"], { env: f.env, cwd: "/", encoding: "utf8", timeout: 10000 });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(existsSync(join(f.home, "forbidden-executables")), false);
-  assert.equal(existsSync(join(plugin, "state")), false, "state must stay outside the code root");
-  assert.equal(JSON.parse(readFileSync(join(f.home, "config/rex/state/session-history.json"), "utf8"))["host:local"].shared.current, "session:b");
+  assert.equal(existsSync(join(f.home, "config/rex/state")), false, "history must not recreate host state");
+  assert.equal(JSON.parse(readFileSync(join(plugin, "state/session-history.json"), "utf8"))["host:local"].shared.current, "session:b");
 });
 
 test("an explicitly empty project directory opens cwd rather than starting discovery", (t) => {

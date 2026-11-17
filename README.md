@@ -35,8 +35,8 @@ rex-navigator/
 └── tests/               # Isolated behavior/integration tests and helpers
 ```
 
-Personal configuration, keybindings and runtime state belong to the host, never
-inside this repository.
+Personal configuration and keybindings belong to the host. Session history is
+kept in the plugin's gitignored `state/` directory; it is never committed.
 
 ## Loading and packaging
 
@@ -77,8 +77,8 @@ change is required**. The project picker opens through the registered action
 (Ctrl+A, F in this example) and receives the settings supplied to `setup()`.
 
 Code and workers resolve their paths relative to their own root, not the current
-working directory. Personal settings stay in your host `init.lua`; runtime state
-stays in the host's XDG paths, outside the code root.
+working directory. Personal settings stay in your host `init.lua`; session history
+is stored under the plugin root, and project associations use the host's XDG state path.
 
 The plugin does not bind keys or change existing pane navigation. No plugin
 manager or future Rex plugin API is assumed.
@@ -203,10 +203,11 @@ a 500 ms timeout; no ordering-status request is made without history. Switch-tim
 validation is still strict: malformed history is never silently overwritten.
 
 `lua/navigation/sessions.lua` stores session IDs (not names) in
-`$XDG_CONFIG_HOME/rex/state/session-history.json`, defaulting to
-`~/.config/rex/state/session-history.json`. The code root can move without moving
-that host-owned state. History is separated by host, written atomically
-under a file lock, and ignored by Git. All apps connected to the same host share
+`state/session-history.json` under the plugin root. Its lock lives alongside it as
+`state/session-history.lock`; `/state/` is ignored by Git. The checkout must be
+writable. Moving the plugin directory moves its history too, and separate checkouts
+have independent histories. History is separated by host and written atomically
+under a file lock. All apps using the same checkout and connected to the same host share
 one last-used pair, so restarting the app or changing its connection ID does not
 reset history. The current client ID is used only to address the connected app.
 Kernel locking uses the same lock file and automatically releases when the actual
@@ -301,7 +302,6 @@ From this repository root, run:
 
 ```sh
 node --test --test-concurrency=2 tests/*.test.mjs
-lua tests/rex-sessions.lua "$PWD"
 ```
 
 Node is a **development-only test runner**, not a production dependency. The suites
@@ -323,4 +323,4 @@ Tests do not create, select, capture, or modify live sessions. Real-app appearan
 remote-control permissions, and live interaction still need manual confirmation.
 
 `text-data.lua` is checked in. Its Unicode version is recorded in its header; the
-offline generator is `tests/helpers/generate-rex-unicode.mjs`. It is not run at startup.
+offline generator is `tools/generate-rex-unicode.mjs`. It is not run at startup.

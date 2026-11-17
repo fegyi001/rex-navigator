@@ -37,11 +37,18 @@ package.path = args.root .. "/?.lua;" .. args.root .. "/?/init.lua;" .. package.
 if args.module_root then
   package.path = args.module_root .. "/?.lua;" .. args.module_root .. "/?/init.lua;" .. package.path
 end
-if os.getenv("TEST_SAVE_REFUSE") == "1" or os.getenv("TEST_FAKE_REX") then
+do
   local runtime = require("lua.navigation.runtime")
   local construct = runtime.new
   runtime.new = function(options)
     local R = construct(options)
+    -- Production history is plugin-local. Keep real checkout paths read-only in
+    -- offline tests; deliberately relocated scratch plugins use their real path.
+    if options.root:sub(1, #args.home + 1) ~= args.home .. "/" then
+      R.state_directory = function()
+        return args.home .. "/plugin/state"
+      end
+    end
     if os.getenv("TEST_SAVE_REFUSE") == "1" then
       R.save_json = function()
         error("synthetic save refusal")

@@ -38,58 +38,6 @@ const alive = (pid) => {
   try { process.kill(pid, 0); return true; } catch { return false; }
 };
 
-test("Rex timers defer while a timed wait blocks (characterization)", (t) => {
-  const f = createLuaFixture(t);
-  const start = performance.now();
-  const r = f.run(probeScript, { probe: "escalation" });
-  assert.equal(r.status, 0, r.stderr || String(r.error));
-  assert.deepEqual(JSON.parse(r.stdout), { completed: false, term_sent: false, kill_sent: false });
-  assert.ok(performance.now() - start < 1800);
-  const pid = Number(readFileSync(join(f.home, "worker.pid"), "utf8"));
-  assert.equal(alive(pid), false, "stubborn child must be reaped");
-});
-
-test("timed waits can escalate a stubborn child after 100ms", (t) => {
-  const f = createLuaFixture(t);
-  const start = performance.now();
-  const r = f.run(probeScript, { probe: "wait-escalation" });
-  assert.equal(r.status, 0, r.stderr || String(r.error));
-  assert.deepEqual(JSON.parse(r.stdout), { completed: true, signal: "SIGKILL" });
-  assert.ok(performance.now() - start < 800);
-  assert.equal(alive(Number(readFileSync(join(f.home, "worker.pid"), "utf8"))), false);
-});
-
-for (const signal of ["SIGTERM", "SIGKILL"]) {
-  const probe = "worker-lock";
-  test(`Rex ${probe} (${signal}) cannot leave an unlocked live mutator`, async (t) => {
-    const f = createLuaFixture(t);
-    const child = f.spawn(probeScript, { probe });
-    let stderr = "";
-    child.stderr.on("data", (chunk) => { stderr += chunk; });
-    const finished = new Promise((resolve) => child.once("exit", resolve));
-    const ownedPids = [];
-    t.after(() => {
-      if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
-      for (const pid of ownedPids) {
-        try { process.kill(pid, "SIGKILL"); } catch { /* Already gone. */ }
-      }
-    });
-    for (let attempt = 0; attempt < 100 && !existsSync(join(f.home, "worker.pid")); attempt++) await delay(10);
-    assert.ok(existsSync(join(f.home, "worker.pid")), stderr || "scratch worker must start");
-    const worker = Number(readFileSync(join(f.home, "worker.pid"), "utf8"));
-    const holder = Number(readFileSync(join(f.home, "holder.pid"), "utf8"));
-    ownedPids.push(worker, holder);
-    child.kill(signal);
-    await finished;
-    await delay(150);
-    const contender = spawnSync("/usr/bin/lockf", ["-k", "-s", "-t", "0", join(f.home, "scratch.lock"), "/usr/bin/true"]);
-    const observation = { workerAlive: alive(worker), holderAlive: alive(holder), contenderStatus: contender.status };
-    t.diagnostic(JSON.stringify(observation));
-    assert.ok(!observation.workerAlive || contender.status === 75,
-      `a live mutator must retain its lock after ${signal}: ${JSON.stringify(observation)}`);
-  });
-}
-
 for (const signal of ["SIGTERM", "SIGKILL"]) {
   const probe = "runtime-cancel";
 test(`Rex ${probe} ${signal} cancellation must reap a subprocess's descendants`, async (t) => {

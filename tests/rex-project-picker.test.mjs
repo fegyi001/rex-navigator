@@ -39,7 +39,7 @@ function fixture(t) {
   const fakeConfig = join(home, "fake-config.json");
   const projectsFile = join(rexConfig, "navigation-config.lua");
   const state = join(home, "state/rex/project-sessions.json");
-  const history = join(rexConfig, "state/session-history.json");
+  const history = join(home, "plugin/state/session-history.json");
   const update = () => {
     writeFileSync(fakeConfig, JSON.stringify(config));
     writeFileSync(projectsFile, "return " + luaLiteral({ projects: settings }));
@@ -430,8 +430,8 @@ test("concurrent opens of the same project create exactly one session", async (t
   assert.deepEqual(f.selected(), ["session_id=session:new1", "session_id=session:new1"]);
 });
 
-test("Lua project/session actions retain their shortcut and argv integration", () => {
-  const result = spawnSync("lua", [join(root, "tests/rex-sessions.lua"), root], { encoding: "utf8" });
+test("Lua navigation actions retain their floating-layer and argv integration", () => {
+  const result = spawnSync("lua", [join(root, "tests/helpers/rex-actions.lua"), root], { encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr);
 });
 

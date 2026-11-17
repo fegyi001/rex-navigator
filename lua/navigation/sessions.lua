@@ -14,7 +14,7 @@ function M.new(R)
 end
 
 function Sessions:history_path()
-  return (os.getenv("XDG_CONFIG_HOME") or assert(os.getenv("HOME")) .. "/.config") .. "/rex/state/session-history.json"
+  return self.R:state_directory() .. "/session-history.json"
 end
 
 function Sessions:read_history()

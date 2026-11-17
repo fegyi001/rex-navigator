@@ -22,7 +22,7 @@ function fixture(t) {
   mkdirSync(bin, { recursive: true });
   const configFile = join(home, "fake-config.json");
   const log = join(home, "selected.jsonl");
-  const state = join(home, "config/rex/state/session-history.json");
+  const state = join(home, "plugin/state/session-history.json");
   const config = {
     client: "client:mac", host: "host:local", pickIndex: 0,
     sessions: [
@@ -118,8 +118,8 @@ test("runtime history and its lock stay inside the ignored state directory", (t)
   f.ok(f.run("select", "session:a", "session:b"));
   assert.equal(existsSync(f.state), true);
   assert.equal(existsSync(f.state.replace(/\.json$/, ".lock")), true);
-  assert.equal(existsSync(join(f.home, "config/rex/session-history.json")), false);
-  assert.equal(existsSync(join(f.home, "config/rex/session-history.lock")), false);
+  assert.equal(existsSync(join(f.home, "config/rex/state/session-history.json")), false);
+  assert.equal(existsSync(join(f.home, "config/rex/state/session-history.lock")), false);
 });
 
 test("recovers a disconnected client's legacy history and preserves old entries", (t) => {

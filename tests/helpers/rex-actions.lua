@@ -1,4 +1,4 @@
--- Exercise real configuration actions without contacting Rex or opening windows.
+-- Exercise real navigation actions without contacting Rex or opening windows.
 local root = assert(arg[1])
 package.path = root .. "/?.lua;" .. root .. "/?/init.lua;" .. package.path
 

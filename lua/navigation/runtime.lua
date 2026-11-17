@@ -8,6 +8,10 @@ function M.new(options)
   return setmetatable({ root = options.root, host = options.host or rex }, Runtime)
 end
 
+function Runtime:state_directory()
+  return self.root .. "/state"
+end
+
 function Runtime:call(method, args)
   local value, err = self.host.call(method, args or {})
   if err then
@@ -168,7 +172,7 @@ function Runtime:transaction(kind, request, wait_seconds)
   local home = assert(os.getenv("HOME"), "HOME is not set")
   local path
   if kind == "session" then
-    path = (os.getenv("XDG_CONFIG_HOME") or home .. "/.config") .. "/rex/state/session-history.lock"
+    path = self:state_directory() .. "/session-history.lock"
   else
     path = (os.getenv("XDG_STATE_HOME") or home .. "/.local/state") .. "/rex/project-sessions.lock"
   end

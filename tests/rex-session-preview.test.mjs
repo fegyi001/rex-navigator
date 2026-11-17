@@ -105,7 +105,7 @@ test("snapshot reads only the active tab's focused terminal and ignores REX_SERV
   assert.equal(options.format, "text");
   assert.equal(options.trim, true);
   assert.ok(options.max_bytes > 0 && options.max_bytes <= 32768);
-  assert.equal(existsSync(join(f.home, "config/rex/state/session-history.json")), false);
+  assert.equal(existsSync(join(f.home, "plugin/state/session-history.json")), false);
 });
 
 test("large Unicode scrollback reads one bounded recent blob tail, not the whole result", (t) => {

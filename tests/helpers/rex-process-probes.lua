@@ -1,53 +1,5 @@
--- Characterization probes for assumptions required by the Lua migration.
-local function write(path, text)
-  local f = assert(io.open(path, "w"))
-  assert(f:write(text))
-  f:close()
-end
-
-if rex.args.probe == "escalation" then
-  local h = assert(rex.exec.start({
-    "/bin/sh",
-    "-c",
-    'trap "" TERM; echo $$ > "$1"; exec /bin/sleep 20',
-    "sh",
-    rex.args.home .. "/worker.pid",
-  }, { stdout = false, stderr = false }))
-  local term_sent, kill_sent = false, false
-  rex.after(0.1, function()
-    term_sent = true
-    h:kill("SIGTERM")
-    rex.after(0.1, function()
-      kill_sent = true
-      h:kill("SIGKILL")
-    end)
-  end)
-  local result = h:wait(1)
-  local completed = result ~= nil
-  if not completed then
-    h:kill("SIGKILL")
-    h:wait(1)
-  end
-  return { completed = completed, term_sent = term_sent, kill_sent = kill_sent }
-end
-
-if rex.args.probe == "wait-escalation" then
-  local h = assert(rex.exec.start({
-    "/bin/sh",
-    "-c",
-    'trap "" TERM; echo $$ > "$1"; exec /bin/sleep 20',
-    "sh",
-    rex.args.home .. "/worker.pid",
-  }, { stdout = false, stderr = false }))
-  assert(h:wait(0.1) == nil)
-  h:kill("SIGTERM")
-  assert(h:wait(0.1) == nil)
-  h:kill("SIGKILL")
-  local result = assert(h:wait(1))
-  return { completed = true, signal = result.signal }
-end
-
-if rex.args.probe == "cleanup-signal" or rex.args.probe == "cleanup-group" or rex.args.probe == "runtime-cancel" then
+-- Runtime regressions run against the production adapter in isolated fixtures.
+if rex.args.probe == "runtime-cancel" then
   local argv = {
     "/bin/sh",
     "-c",
@@ -57,48 +9,8 @@ if rex.args.probe == "cleanup-signal" or rex.args.probe == "cleanup-group" or re
     "sh",
     rex.args.home,
   }
-  if rex.args.probe == "cleanup-group" then
-    table.insert(argv, 1, rex.args.root .. "/tests/helpers/rex-process-group-probe.sh")
-    table.insert(argv, 1, "/bin/sh")
-  end
-  if rex.args.probe == "runtime-cancel" then
-    local R = require("lua.navigation.runtime").new({ root = rex.args.root, host = rex })
-    return R:run(argv, { timeout = 20 })
-  end
-  local h = assert(rex.exec.start(argv, { stdout = false, stderr = false }))
-  write(rex.args.home .. "/holder.pid", tostring(h.pid))
-  h:wait(25)
-  return
-end
-
-if rex.args.probe == "parent-death" or rex.args.probe == "worker-lock" then
-  local argv = {
-    "/usr/bin/lockf",
-    "-k",
-    "-s",
-    "-t",
-    "0",
-    rex.args.home .. "/scratch.lock",
-    "/bin/sh",
-    "-c",
-    'echo $$ > "$1"; exec /bin/sleep 20',
-    "sh",
-    rex.args.home .. "/worker.pid",
-  }
-  if rex.args.probe == "worker-lock" then
-    argv = {
-      "/bin/sh",
-      "-c",
-      'exec 3>>"$1"; shift; /usr/bin/lockf -s -t 0 3 || exit $?; ' .. 'echo $$ > "$1"; exec /bin/sleep 20',
-      "sh",
-      rex.args.home .. "/scratch.lock",
-      rex.args.home .. "/worker.pid",
-    }
-  end
-  local h = assert(rex.exec.start(argv, { stdout = false, stderr = false }))
-  write(rex.args.home .. "/holder.pid", tostring(h.pid))
-  h:wait(25)
-  return
+  local R = require("lua.navigation.runtime").new({ root = rex.args.root, host = rex })
+  return R:run(argv, { timeout = 20 })
 end
 
 if rex.args.probe == "module" then
