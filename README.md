@@ -1,9 +1,35 @@
 # Rex navigator
 
-Session/project pickers, last-used switching, and read-only terminal previews.
+<a href="https://www.superlogical.com">
+  <img src="assets/rex-logo.png" alt="Rex Beta logo" width="128" height="128">
+</a>
+
+## What is Rex?
+
+[Rex](https://www.superlogical.com/rex/docs) is a terminal multiplexer from
+[Superlogical](https://www.superlogical.com), whose team includes
+[Mitchell Hashimoto](https://mitchellh.com), creator of Ghostty and co-founder of
+HashiCorp. It organizes terminals into long-lived sessions, so you can close a
+client, reconnect from another device, and resume your work without starting your
+terminals again.
+
+You can customize Rex with Lua configuration, keybindings, and custom actions, or
+automate it through its CLI and server API. Rex is currently in beta; see the
+[official documentation](https://www.superlogical.com/rex/docs) for usage and the
+[installation guide](https://www.superlogical.com/rex/docs/installation) for current
+platform availability.
+
+## What does Rex navigator add?
+
+Rex navigator is an unofficial Lua extension for Rex. It adds fuzzy session and
+project pickers, last-used session switching, and read-only terminal previews in
+focused floating panes. You configure it through `require("rex-navigator").setup()`
+in your Rex `init.lua` and open its actions with your chosen keybindings.
+
 All navigation logic runs in **Rex's embedded Lua**, with fzf for the interface.
-No Node.js, standalone Lua installation, npm packages, or build step is needed
-to use it. This is a local Lua extension, not an official Rex plugin format.
+You do not need Node.js, a standalone Lua installation, npm packages, or a build
+step to use it. This project is not an official Superlogical product or Rex plugin
+format. The Rex logo above identifies the application this extension works with.
 
 ## Layout
 
