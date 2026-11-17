@@ -31,6 +31,23 @@ You do not need Node.js, a standalone Lua installation, npm packages, or a build
 step to use it. This project is not an official Superlogical product or Rex plugin
 format. The Rex logo above identifies the application this extension works with.
 
+### Project picker
+
+Open the project picker with **Ctrl+A, F** using the example keybindings below.
+Type to filter your configured project directories, then press **Enter** to create
+or reuse the project's Rex session and switch to it. Press **Esc** to cancel.
+
+![Project picker showing project directories in a floating Rex pane](assets/project-picker.png)
+
+### Session picker
+
+Open the session picker with **Ctrl+A, Space** using the example keybindings below.
+Filter existing sessions by name and view a read-only terminal preview on the
+right. The last-used session appears first, marked `(last used)`. Press **Enter**
+to switch, or **Esc** to cancel.
+
+![Session picker showing the last-used session and a terminal preview](assets/session-picker.png)
+
 ## Layout
 
 ```text
