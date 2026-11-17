@@ -177,7 +177,8 @@ looks for `$XDG_CONFIG_HOME/rex/navigation-config.lua`, defaulting to
 The following bindings refer to the example configuration above. The plugin
 registers action names; you choose their bindings and whether to use a prefix.
 
-- **`open_session_picker`** (example: **Ctrl+A → Space**) opens an fzf session picker in a focused floating pane over
+- **`open_session_picker`** (example: **Ctrl+A → Space**) opens an fzf session picker
+  in a focused floating pane over
   the invoking tab, centered at 70% of its width and 60% of its height. It creates
   no temporary tab. The current session is excluded; the last-used destination
   comes first, marked `(last used)`, followed by other sessions alphabetically,
@@ -185,7 +186,8 @@ registers action names; you choose their bindings and whether to use a prefix.
   previews a terminal text snapshot. Typing ranks matches by fuzzy relevance;
   clearing the query restores last-used-first order.
   Esc cancels and closes the pane; selecting a session switches and closes it.
-- **`open_project_picker`** (example: **Ctrl+A → f**) opens the project picker in the same centered, focused 70% × 60%
+- **`open_project_picker`** (example: **Ctrl+A → f**) opens the project picker
+  in the same centered, focused 70% × 60%
   floating pane. Esc cancels; opening a project closes the pane after creating
   or reusing its session and switching to it. No temporary tab is created.
 - **`last_used_session`** (example: **Ctrl+A → Enter**) toggles the last two sessions
