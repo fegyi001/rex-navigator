@@ -26,6 +26,12 @@ project pickers, last-used session switching, and read-only terminal previews in
 focused floating panes. You configure it through `require("rex-navigator").setup()`
 in your Rex `init.lua` and open its actions with your chosen keybindings.
 
+**The Rex action keybindings in this README are examples, not plugin defaults.**
+Bind the actions to any keys or key sequences supported by Rex in your `init.lua`.
+The examples use **Ctrl+A as a prefix key**, matching the author's previous tmux
+configuration: press **Ctrl+A**, release it, then press the next key.
+For example, **Ctrl+A → f** means Ctrl+A followed by lowercase `f`.
+
 All navigation logic runs in **Rex's embedded Lua**, with fzf for the interface.
 You do not need Node.js, a standalone Lua installation, npm packages, or a build
 step to use it. This project is not an official Superlogical product or Rex plugin
@@ -33,7 +39,7 @@ format. The Rex logo above identifies the application this extension works with.
 
 ### Project picker
 
-Open the project picker with **Ctrl+A, F** using the example keybindings below.
+With the example keybindings below, press **Ctrl+A → f** to open the project picker.
 Type to filter your configured project directories, then press **Enter** to create
 or reuse the project's Rex session and switch to it. Press **Esc** to cancel.
 
@@ -41,7 +47,7 @@ or reuse the project's Rex session and switch to it. Press **Esc** to cancel.
 
 ### Session picker
 
-Open the session picker with **Ctrl+A, Space** using the example keybindings below.
+With the example keybindings below, press **Ctrl+A → Space** to open the session picker.
 Filter existing sessions by name and view a read-only terminal preview on the
 right. The last-used session appears first, marked `(last used)`. Press **Enter**
 to switch, or **Esc** to cancel.
@@ -105,6 +111,7 @@ require("rex-navigator").setup({
   },
 })
 
+-- Example bindings: Ctrl+A is the prefix; choose your own keys or sequences.
 rex.bind("ctrl+a>space", "open_session_picker")
 rex.bind("ctrl+a>f", "open_project_picker")
 rex.bind("ctrl+a>enter", "last_used_session")
@@ -115,9 +122,14 @@ Requiring the module alone has no effects. `setup()` registers
 configuration owns bindings. Call setup once per configuration load. An optional
 `{ root = "/absolute/path" }` overrides code-root discovery.
 
+Rex uses `>` to separate keys in a sequence: `ctrl+a>f` means **Ctrl+A → f**.
+You can change the prefix, use another sequence, or bind an action to a single
+shortcut. See Rex's [key sequences](https://www.superlogical.com/rex/docs/customize/key-sequences)
+and [keyboard shortcuts](https://www.superlogical.com/rex/docs/customize/keyboard-shortcuts) documentation.
+
 That's the complete plugin setup: **no extra config file, shell command, or PATH
 change is required**. The project picker opens through the registered action
-(Ctrl+A, F in this example) and receives the settings supplied to `setup()`.
+(Ctrl+A → f in this example) and receives the settings supplied to `setup()`.
 
 Code and workers resolve their paths relative to their own root, not the current
 working directory. Personal settings stay in your host `init.lua`; session history
@@ -160,9 +172,12 @@ before project operations. With neither `projects` nor `config` supplied, discov
 looks for `$XDG_CONFIG_HOME/rex/navigation-config.lua`, defaulting to
 `~/.config/rex/navigation-config.lua`. Inline `projects` always takes precedence.
 
-## Shortcuts and requirements
+## Actions and example keybindings
 
-- **Ctrl+A, Space** opens an fzf session picker in a focused floating pane over
+The following bindings refer to the example configuration above. The plugin
+registers action names; you choose their bindings and whether to use a prefix.
+
+- **`open_session_picker`** (example: **Ctrl+A → Space**) opens an fzf session picker in a focused floating pane over
   the invoking tab, centered at 70% of its width and 60% of its height. It creates
   no temporary tab. The current session is excluded; the last-used destination
   comes first, marked `(last used)`, followed by other sessions alphabetically,
@@ -170,18 +185,22 @@ looks for `$XDG_CONFIG_HOME/rex/navigation-config.lua`, defaulting to
   previews a terminal text snapshot. Typing ranks matches by fuzzy relevance;
   clearing the query restores last-used-first order.
   Esc cancels and closes the pane; selecting a session switches and closes it.
-- **Ctrl+A, F** opens the project picker in the same centered, focused 70% × 60%
+- **`open_project_picker`** (example: **Ctrl+A → f**) opens the project picker in the same centered, focused 70% × 60%
   floating pane. Esc cancels; opening a project closes the pane after creating
   or reusing its session and switching to it. No temporary tab is created.
-- **Ctrl+A, Enter** toggles the last two sessions selected through the session
-  picker or project picker (**Ctrl+A, F**).
-- **Ctrl+A, L** remains right-pane navigation; it is not the session toggle.
+- **`last_used_session`** (example: **Ctrl+A → Enter**) toggles the last two sessions
+  selected through either picker.
+
+Existing pane-navigation bindings stay under your control. For example, the
+author uses **Ctrl+A → l** for right-pane navigation; this plugin does not bind it.
 
 Reload through Rex's **Reload Config** command, or run `rex config reload`, to
 activate the Lua action registration. The compatible command wrappers
 run Lua immediately on their next invocation; no automatic reload is performed.
-Then switch from session A to B with either picker. Press **Ctrl+A, Enter**
+Then switch from session A to B with either picker. With the example bindings, press **Ctrl+A → Enter**
 twice: it should return to A, then B.
+
+## Requirements
 
 Requirements are `fzf`, a Rex version with the documented `rex.exec.start`/handle
 Lua functions, and macOS built-ins including `lockf`, `find`, `sort`, `realpath`,
