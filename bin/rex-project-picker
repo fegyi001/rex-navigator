@@ -1,0 +1,4 @@
+#!/bin/sh
+# Root-relative command; no host installation layout is assumed.
+set -eu
+exec /bin/sh "${0%/*}/../scripts/navigation.sh" project "$@"
