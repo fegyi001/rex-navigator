@@ -1,15 +1,10 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import test from "node:test";
-
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+import { runLua } from "./helpers/standalone-lua.mjs";
 
 function setup(options = "{}") {
   // Only the external layer-creation API is replaced; run real setup and actions.
   const script = `
-package.path = arg[1] .. "/?.lua;" .. arg[1] .. "/?/init.lua;" .. package.path
 local actions, count, layers = {}, 0, {}
 rex = {
   action = function(action)
@@ -38,10 +33,8 @@ else
   end
 end
 `;
-  const result = spawnSync("lua", ["-", root], {
-    input: script, encoding: "utf8", cwd: "/", timeout: 5000,
-  });
-  assert.equal(result.status, 0, result.stderr);
+  const result = runLua(script);
+  assert.equal(result.status, 0, result.stderr || String(result.error));
   const [ok, count, ...output] = result.stdout.trim().split("\n");
   return { ok: ok === "true", count: Number(count), output };
 }

@@ -25,8 +25,8 @@ Use `rex-navigator` to:
 - quickly switch back-and-forth your last-used session
 
 The pickers open in focused floating panes over your
-current tab. It uses Rex's embedded Lua and fzf; you don't
-need to install anything to use it.
+current tab. It uses Rex's embedded Lua and fzf; Node.js and standalone Lua are
+not needed at runtime. See [Requirements](#requirements).
 
 **The action keybindings below are examples.** Choose your own Rex-supported keys
 or key sequences in `init.lua`. The examples use **Ctrl+A as a prefix key** to
@@ -64,6 +64,10 @@ session-switching actions do not update this history. See
   Rex Remote Control so the plugin can select sessions in the app.**
 - fzf and the macOS tools `lockf`, `find`, `sort`, `realpath`, `openssl`, `mktemp`,
   and `dd` with `conv=fsync` support. Linux and Windows support is not implemented.
+
+Tested with Rex `0.1.0-preview.20` (API revision 16) and fzf `0.75.0` on macOS
+`27.2.1`. These are tested versions, not minimum requirements. See
+[Contributing](CONTRIBUTING.md#tested-environment) for the development environment.
 
 The workers look for executables in PATH, Rex's managed macOS installation, and
 local/Homebrew locations. They do not source shell startup files.
@@ -268,7 +272,14 @@ or cancellation. The plugin starts workers on demand and runs no persistent daem
 
 ## Tests
 
-From this repository root, run:
+For quick local checks with Node.js and standalone Lua/luac, without Rex or a
+running server:
+
+```sh
+sh scripts/check.sh
+```
+
+For the full Rex integration suite, start Rex and run from this repository root:
 
 ```sh
 node --test --test-concurrency=2 tests/*.test.mjs
@@ -288,6 +299,9 @@ Check appearance, Remote Control permissions, and live preview responsiveness in
 the app; the isolated suite does not verify those. Regenerate the checked-in
 `text-data.lua` with `tools/generate-rex-unicode.mjs`; its header records the Unicode
 version. The plugin does not run the generator at startup.
+
+See [Contributing](CONTRIBUTING.md) for standalone test commands, style guidance,
+and the manual app checklist. All checks run locally; no CI service is required.
 
 ## License
 
