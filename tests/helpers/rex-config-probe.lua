@@ -2,7 +2,7 @@ local config = require("lua.navigation.config")
 if rex.args.operation == "action" then
   local command
   rex.action = function(action)
-    if action.name == "open_project_picker" then
+    if action.name == "rex_navigator_open_project_picker" then
       command = action.run
     end
   end
@@ -19,6 +19,7 @@ if rex.args.operation == "action" then
     end,
   }
   require("lua.navigation").setup(rex.args.options)
+  assert(command, "Prefixed project action was not registered")
   command({ client_id = "client:mac", session_id = "session:a" })
   return launched
 end

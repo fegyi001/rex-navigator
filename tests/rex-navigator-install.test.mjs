@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, rmSync, symlinkSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { createLuaFixture, realRex } from "./helpers/rex-lua-fixture.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -30,9 +31,29 @@ local navigation = require("rex-navigator")
 assert(navigation == require("rex-navigator.lua.navigation"), "both imports must share one module")
 assert(next(actions) == nil)
 navigation.setup(${obsoleteRoot ? '{ root = "/unrelated-plugin-checkout" }' : ""})
-actions.last_used_session.run({client_id="client:test", session_id="session:test"})
+actions["rex_navigator_last_used_session"].run({client_id="client:test", session_id="session:test"})
 `;
     const result = spawnSync("lua", ["-", home], { input: script, encoding: "utf8", cwd: "/" });
     assert.equal(result.status, 0, result.stderr);
   });
 }
+
+test("Rex accepts the plugin action names and bindings without reloading its configuration", (t) => {
+  const f = createLuaFixture(t);
+  const config = join(f.home, "config/rex");
+  mkdirSync(config, { recursive: true });
+  symlinkSync(root, join(config, "rex-navigator"));
+  const init = join(config, "init.lua");
+  writeFileSync(init, `
+require("rex-navigator").setup()
+rex.bind("ctrl+a>f", "rex_navigator_open_project_picker")
+rex.bind("ctrl+a>space", "rex_navigator_open_session_picker")
+rex.bind("ctrl+a>enter", "rex_navigator_last_used_session")
+`);
+  const result = spawnSync(realRex, ["--autostart=false", "config", "check", init], {
+    env: f.env, cwd: "/", encoding: "utf8", timeout: 10000,
+  });
+  assert.equal(result.status, 0, `${result.stderr}\n${result.stdout}`);
+  assert.match(result.stdout, /actions:\s+3/);
+  assert.match(result.stdout, /bindings:\s+3/);
+});

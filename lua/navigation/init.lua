@@ -64,7 +64,7 @@ function M.setup(options)
     assert(layer, err or "Could not open the floating picker")
   end
   rex.action({
-    name = "open_session_picker",
+    name = "rex_navigator_open_session_picker",
     title = "Switch Session (With History)",
     description = "Choose a session and remember this one for last-used switching",
     run = function(ctx)
@@ -72,7 +72,7 @@ function M.setup(options)
     end,
   })
   rex.action({
-    name = "open_project_picker",
+    name = "rex_navigator_open_project_picker",
     title = "Open Project Workspace",
     description = "Find a project folder and open or switch to its workspace",
     run = function(ctx)
@@ -80,7 +80,7 @@ function M.setup(options)
     end,
   })
   rex.action({
-    name = "last_used_session",
+    name = "rex_navigator_last_used_session",
     title = "Last Used Session",
     description = "Switch back and forth between the last two sessions selected through the pickers",
     run = function(ctx)

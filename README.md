@@ -1,6 +1,6 @@
 # `rex-navigator`
 
-> Session and project navigation for the Rex terminal multiplexer.
+> Improved session and project navigation for the Rex terminal multiplexer.
 
 <a href="https://www.superlogical.com">
   <img src="assets/rex-logo.png" alt="Rex Beta logo" width="128" height="128">
@@ -8,10 +8,17 @@
 
 ## About Rex
 
-[Superlogical](https://www.superlogical.com) builds
-[Rex](https://www.superlogical.com/rex/docs), a terminal multiplexer. The team
+[Rex](https://www.superlogical.com/rex/docs) is a modern terminal multiplexer
+built by [Superlogical](https://www.superlogical.com). The team
 includes [Mitchell Hashimoto](https://mitchellh.com/), creator of
 [Ghostty](https://ghostty.org/).
+
+## What is `rex-navigator`
+
+`rex-navigator` is an unofficial Rex extension that provides a fuzzy-search
+interface for switching between sessions and project directories. It uses Rex's
+embedded Lua and fzf to provide a fast, keyboard-driven workflow for navigating
+your projects and sessions.
 
 ## Features
 
@@ -27,7 +34,7 @@ next key. **Ctrl+A → f** means Ctrl+A followed by lowercase `f`.
 
 ### Project picker
 
-Run `open_project_picker` (example: **Ctrl+A → f**) to search your configured
+Run `rex_navigator_open_project_picker` (example: **Ctrl+A → f**) to search your configured
 project directories. Type to filter, then press **Enter** to create or reuse the
 project's Rex session and switch to it. Press **Esc** to cancel.
 
@@ -35,7 +42,7 @@ project's Rex session and switch to it. Press **Esc** to cancel.
 
 ### Session picker
 
-Run `open_session_picker` (example: **Ctrl+A → Space**) to filter existing sessions
+Run `rex_navigator_open_session_picker` (example: **Ctrl+A → Space**) to filter existing sessions
 by name and view a read-only terminal preview. The last-used session comes first,
 marked `(last used)`. Press **Enter** to switch, or **Esc** to cancel.
 
@@ -43,7 +50,7 @@ marked `(last used)`. Press **Enter** to switch, or **Esc** to cancel.
 
 ### Last-used session
 
-Run `last_used_session` (example: **Ctrl+A → Enter**) to switch back without
+Run `rex_navigator_last_used_session` (example: **Ctrl+A → Enter**) to switch back without
 opening a picker. After a switch from A to B through either picker, repeat the
 action to toggle **B → A → B → A**.
 
@@ -85,9 +92,9 @@ require("rex-navigator").setup({
 })
 
 -- Example bindings: Ctrl+A is the prefix; choose your own keys or sequences.
-rex.bind("ctrl+a>space", "open_session_picker")
-rex.bind("ctrl+a>f", "open_project_picker")
-rex.bind("ctrl+a>enter", "last_used_session")
+rex.bind("ctrl+a>space", "rex_navigator_open_session_picker")
+rex.bind("ctrl+a>f", "rex_navigator_open_project_picker")
+rex.bind("ctrl+a>enter", "rex_navigator_last_used_session")
 ```
 
 Call `setup()` once per configuration load to register the three actions. Importing
