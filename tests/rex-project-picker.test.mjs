@@ -12,7 +12,7 @@ import { installLegacyLua } from "./helpers/rex-legacy-lua.mjs";
 import { luaLiteral } from "./helpers/lua-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const wrapper = join(root, "bin/rex-project-picker");
+const launcher = join(root, "scripts/navigation.sh");
 const quote = (text) => `'${text.replaceAll("'", "'\\''")}'`;
 
 function fixture(t) {
@@ -398,14 +398,14 @@ test("unknown fzf selections are rejected before creating a session", (t) => {
   assert.deepEqual(f.calls(), []);
 });
 
-test("existing executable wrapper uses embedded Lua with minimal GUI PATH", (t) => {
+test("project worker launcher uses embedded Lua with minimal GUI PATH", (t) => {
   const f = fixture(t);
   const directory = f.project("alpha");
   const managed = join(f.home, "Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS/rex");
   mkdirSync(dirname(managed), { recursive: true });
   symlinkSync(join(f.bin, "rex"), managed);
   f.update();
-  const result = spawnSync(wrapper, f.args(directory), {
+  const result = spawnSync("/bin/sh", [launcher, "project", ...f.args(directory)], {
     env: { ...f.env, PATH: "/usr/bin:/bin:/usr/sbin:/sbin" }, encoding: "utf8", timeout: 15_000,
   });
   f.ok(result);

@@ -21,7 +21,7 @@ function fixture(t) {
   writeFileSync(path, settings(directory));
   writeFileSync(join(f.home, "fake-bin/fzf"), '#!/bin/sh\n/bin/cat | /usr/bin/tee "$TEST_HOME/project-records"\n', { mode: 0o755 });
   const env = { ...f.env, TEST_PURE_API: "1", REX_SESSION: "session:a" };
-  const cli = (args = [], command) => spawnSync("/bin/sh", command || [join(root, "bin/rex-project-picker"), "--client", "client:mac", ...args], {
+  const cli = (args = [], command) => spawnSync("/bin/sh", command || [join(root, "scripts/navigation.sh"), "project", "--client", "client:mac", ...args], {
     env, cwd: "/", encoding: "utf8", timeout: 10000,
   });
   return { ...f, directory, path, cli };
@@ -73,7 +73,7 @@ for (const [name, source, error] of [
   });
 }
 
-test("default action and standalone CLI discover the same projects without projects.json", (t) => {
+test("default action and its worker launcher discover the same projects without projects.json", (t) => {
   const f = fixture(t);
   const action = f.run(probe, { operation: "action" });
   assert.equal(action.status, 0, action.stderr);
@@ -105,7 +105,7 @@ test("project help, session actions and direct-directory opens never execute dis
     const result = f.cli(args);
     assert.equal(result.status, 0, result.stderr);
   }
-  const result = spawnSync("/bin/sh", [join(root, "scripts/session-picker.sh"), "select", "--client", "client:mac", "--current", "session:a", "--session", "session:b"], {
+  const result = spawnSync("/bin/sh", [join(root, "scripts/navigation.sh"), "session", "select", "--client", "client:mac", "--current", "session:a", "--session", "session:b"], {
     env: { ...f.env, TEST_PURE_API: "1" }, encoding: "utf8", timeout: 10000,
   });
   assert.equal(result.status, 0, result.stderr);

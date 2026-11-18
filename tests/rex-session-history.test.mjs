@@ -10,7 +10,7 @@ import { installLegacyLua } from "./helpers/rex-legacy-lua.mjs";
 import { testCommandPath as commandPath } from "./helpers/rex-lua-fixture.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const launcher = join(root, "scripts/session-picker.sh");
+const launcher = join(root, "scripts/navigation.sh");
 const quote = (text) => `'${text.replaceAll("'", "'\\''")}'`;
 
 function fixture(t) {
@@ -611,7 +611,7 @@ test("launcher finds managed Rex and fzf under a minimal GUI PATH", (t) => {
   mkdirSync(dirname(managed), { recursive: true });
   symlinkSync(join(f.bin, "rex"), managed);
   f.update();
-  const result = spawnSync("/bin/sh", [launcher, ...f.args("pick")], {
+  const result = spawnSync("/bin/sh", [launcher, "session", ...f.args("pick")], {
     env: { ...f.env, PATH: "/usr/bin:/bin:/usr/sbin:/sbin" }, encoding: "utf8", timeout: 10_000,
   });
   f.ok(result);
@@ -623,7 +623,7 @@ test("argument validation rejects missing target and unknown options before cont
   const result = f.run("select");
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /requires --session/);
-  const unknown = spawnSync("/bin/sh", [launcher, "toggle", "--unknown"], { env: f.env, encoding: "utf8" });
+  const unknown = spawnSync("/bin/sh", [launcher, "session", "toggle", "--unknown"], { env: f.env, encoding: "utf8" });
   assert.notEqual(unknown.status, 0);
   assert.deepEqual(f.selected(), []);
 });

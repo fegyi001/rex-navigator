@@ -19,10 +19,9 @@ function cliFixture(t) {
   writeFileSync(luaTrap, 'local f=assert(io.open(os.getenv("TEST_HOME").."/forbidden-executables","a"));f:write("lua\\n");f:close();error("standalone Lua forbidden")');
   const env = { ...f.env, PATH: `${join(f.home, "fake-bin")}:/usr/bin:/bin`, TEST_PURE_API: "1", REX_SESSION: "session:a",
     NODE_OPTIONS: `--require=${nodeTrap}`, LUA_INIT: `@${luaTrap}`, LUA_INIT_5_4: `@${luaTrap}` };
-  const session = join(root, "scripts/session-picker.sh");
-  const project = join(root, "bin/rex-project-picker");
+  const launcher = join(root, "scripts/navigation.sh");
   const run = (kind, args, options = {}) => {
-    const result = spawnSync("/bin/sh", [kind === "session" ? session : project, ...args], {
+    const result = spawnSync("/bin/sh", [launcher, kind, ...args], {
       env: { ...env, ...options.env }, cwd: options.cwd || f.home, input: options.input, encoding: "utf8", timeout: 10000,
     });
     assert.equal(existsSync(join(f.home, "forbidden-executables")), false, "production invoked Node or standalone Lua");
@@ -31,7 +30,7 @@ function cliFixture(t) {
   return { ...f, env, config, run };
 }
 
-test("public session CLI selects and toggles using embedded Lua with Node poisoned", (t) => {
+test("session worker launcher selects and toggles using embedded Lua with Node poisoned", (t) => {
   const f = cliFixture(t);
   for (const [command, current, target] of [["select", "session:a", "session:b"], ["toggle", "session:b"]]) {
     const r = f.run("session", [command, "--client", "client:mac", "--current", current, ...(target ? ["--session", target] : [])]);
@@ -43,7 +42,7 @@ test("public session CLI selects and toggles using embedded Lua with Node poison
 });
 
 for (const name of ["123", "true", "quote'\nline", "-dash"]) {
-  test(`public project CLI preserves a relative path without Node: ${JSON.stringify(name)}`, (t) => {
+  test(`project worker launcher preserves a relative path without Node: ${JSON.stringify(name)}`, (t) => {
     const f = cliFixture(t);
     mkdirSync(join(f.home, name));
     const r = f.run("project", ["--client=client:mac", "--", name]);
@@ -53,9 +52,13 @@ for (const name of ["123", "true", "quote'\nline", "-dash"]) {
   });
 }
 
-test("public CLI validates help and malformed flags before attempting an operation", (t) => {
+test("worker launcher help names its real entrypoint and validates malformed flags before operations", (t) => {
   const f = cliFixture(t);
-  assert.equal(f.run("session", ["--help"]).status, 0);
+  for (const kind of ["session", "project"]) {
+    const help = f.run(kind, ["--help"]);
+    assert.equal(help.status, 0, help.stderr);
+    assert.match(help.stdout, new RegExp(`Usage: navigation\\.sh ${kind} `));
+  }
   for (const args of [["select", "--client", "client:mac", "--current", "session:a"], ["toggle", "--unknown"], ["pick", "--client"]]) {
     const r = f.run("session", args);
     assert.notEqual(r.status, 0);
@@ -85,7 +88,7 @@ test("a relocated quoted/newline code root remains independent of cwd and Node",
   const plugin = join(f.home, "plugin ' quoted\nroot");
   cpSync(join(root, "scripts"), join(plugin, "scripts"), { recursive: true });
   cpSync(join(root, "lua/navigation"), join(plugin, "lua/navigation"), { recursive: true });
-  const result = spawnSync("/bin/sh", [join(plugin, "scripts/session-picker.sh"), "select", "--client", "client:mac", "--current", "session:a", "--session", "session:b"], { env: f.env, cwd: "/", encoding: "utf8", timeout: 10000 });
+  const result = spawnSync("/bin/sh", [join(plugin, "scripts/navigation.sh"), "session", "select", "--client", "client:mac", "--current", "session:a", "--session", "session:b"], { env: f.env, cwd: "/", encoding: "utf8", timeout: 10000 });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(existsSync(join(f.home, "forbidden-executables")), false);
   assert.equal(existsSync(join(f.home, "config/rex/state")), false, "history must not recreate host state");

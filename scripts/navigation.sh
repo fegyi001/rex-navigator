@@ -7,9 +7,9 @@ if [ "$#" -gt 0 ]; then shift; fi
 die() { echo "rex-navigator: $*" >&2; exit 1; }
 usage() {
   if [ "$kind" = session ]; then
-    echo 'Usage: session-picker.sh {pick,toggle,select} --client CLIENT --current SESSION [--session TARGET] [--picker-tab]'
+    echo 'Usage: navigation.sh session {pick,toggle,select} --client CLIENT --current SESSION [--session TARGET] [--picker-tab]'
   else
-    echo 'Usage: rex-project-picker [DIRECTORY] [--config FILE] [--client CLIENT] [--picker-tab]'
+    echo 'Usage: navigation.sh project [DIRECTORY] [--config FILE] [--client CLIENT] [--picker-tab]'
   fi
   exit 0
 }

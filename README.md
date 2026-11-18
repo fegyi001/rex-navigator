@@ -60,7 +60,6 @@ to switch, or **Esc** to cancel.
 rex-navigator/
 ├── README.md
 ├── init.lua             # Public require("rex-navigator") entrypoint
-├── bin/rex-project-picker # Optional root-relative CLI command
 ├── lua/
 │   └── navigation/       # Importable navigation module
 │       ├── init.lua      # setup(): register actions, no bindings
@@ -79,8 +78,7 @@ rex-navigator/
 │   ├── lock-transaction.sh
 │   ├── process-group.sh # Bounded worker/descendant cleanup
 │   ├── session-preview.lua
-│   ├── snapshot.lua
-│   └── session-picker.sh # Compatible session CLI entrypoint
+│   └── snapshot.lua
 └── tests/               # Isolated behavior/integration tests and helpers
 ```
 
@@ -197,8 +195,8 @@ Existing pane-navigation bindings stay under your control. For example, the
 author uses **Ctrl+A → l** for right-pane navigation; this plugin does not bind it.
 
 Reload through Rex's **Reload Config** command, or run `rex config reload`, to
-activate the Lua action registration. The compatible command wrappers
-run Lua immediately on their next invocation; no automatic reload is performed.
+activate the Lua action registration. The plugin launches its own workers;
+no automatic reload is performed.
 Then switch from session A to B with either picker. With the example bindings, press **Ctrl+A → Enter**
 twice: it should return to A, then B.
 
@@ -329,37 +327,6 @@ fails. It never changes the app's selected session. Generic
 `rex.call("session.view", ...)` without attachment would fail with a 409 conflict.
 Canonical cwd results are cached only for that one scan, not across project opens.
 
-### Optional standalone commands
-
-These are not needed for the plugin or keybindings. For standalone CLI use, add
-the checkout's `bin/` to PATH or invoke its `bin/rex-project-picker` directly.
-Direct-directory opens need no discovery configuration:
-
-```sh
-rex-project-picker ~/code/my-project
-rex-project-picker --client CLIENT_ID -- ./-project-with-leading-dash
-```
-
-Standalone processes do not read inline `setup()` settings. To run discovery from
-the CLI, explicitly provide a file using the optional format above, or place it
-at the fallback config path:
-
-```sh
-rex-project-picker --config /path/to/navigation-config.lua
-```
-
-For session commands, use `scripts/session-picker.sh`:
-
-```sh
-/bin/sh /path/to/rex-navigator/scripts/session-picker.sh pick --client CLIENT_ID --current SESSION_ID
-/bin/sh /path/to/rex-navigator/scripts/session-picker.sh --client CLIENT_ID --current SESSION_ID toggle
-```
-
-Operations are `pick`, `toggle`, and `select` (`select` also needs `--session ID`).
-Options can precede or follow the operation. Use `--help` for usage. These commands
-target the local Rex server. Multiple apps require an explicit `--client` when
-opening projects. Pass values beginning with a dash as `--option=VALUE`.
-
 ## Tests
 
 From this repository root, run:
@@ -371,7 +338,7 @@ node --test --test-concurrency=2 tests/*.test.mjs
 Node is a **development-only test runner**, not a production dependency. The suites
 run real Lua modules/workers inside Rex, isolated fake API/client responses, temporary
 project/state files, real kernel-lock contention, installed fzf, and private PTYs.
-The no-Node CLI suite uses shell/Lua fakes and poisons Node startup (including an
+The no-Node launcher suite uses shell/Lua fakes and poisons Node startup (including an
 absolute Node executable) to catch hidden runtime dependencies.
 
 Development prerequisites: Node.js with the built-in test runner, Rex, fzf, a
@@ -388,3 +355,9 @@ remote-control permissions, and live interaction still need manual confirmation.
 
 `text-data.lua` is checked in. Its Unicode version is recorded in its header; the
 offline generator is `tools/generate-rex-unicode.mjs`. It is not run at startup.
+
+## License
+
+Code and documentation are available under the [MIT license](LICENSE).
+The Rex logo in `assets/rex-logo.png` is a third-party asset from Superlogical and
+is not covered by this license.
