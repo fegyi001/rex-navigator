@@ -1,4 +1,4 @@
-# Rex navigator
+# `rex-navigator`
 
 > Lua plugin for improved session/project navigation in Rex terminal multiplexer
 
@@ -11,9 +11,9 @@
 [Rex](https://www.superlogical.com/rex/docs) is a terminal multiplexer from [Superlogical](https://www.superlogical.com) created by [Mitchell Hashimoto](https://mitchellh.com/), creator of [Ghostty](https://ghostty.org/)
 .
 
-## What does Rex navigator add?
+## What does `rex-navigator` add?
 
-Rex navigator is an unofficial Lua extension for Rex. It adds fuzzy session and
+`rex-navigator` is an unofficial Lua extension for Rex. It adds fuzzy session and
 project pickers, last-used session switching, and read-only terminal previews in
 focused floating panes. You configure it through `require("rex-navigator").setup()`
 in your Rex `init.lua` and open its actions with your chosen keybindings.
