@@ -143,7 +143,9 @@ at most `1`.
 require("rex-navigator").setup({
   window = { width = 0.8, height = 0.7 },
   projects = {
-    roots = { { path = "~/code", depth = 2 } },
+    roots = {
+      { path = "~/code", depth = 2 }
+    },
   },
 })
 ```
