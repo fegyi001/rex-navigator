@@ -11,12 +11,6 @@
 [Rex](https://www.superlogical.com/rex/docs) is a terminal multiplexer from [Superlogical](https://www.superlogical.com) created by [Mitchell Hashimoto](https://mitchellh.com/), creator of [Ghostty](https://ghostty.org/)
 .
 
-You can customize Rex with Lua configuration, keybindings, and custom actions, or
-automate it through its CLI and server API. Rex is currently in beta; see the
-[official documentation](https://www.superlogical.com/rex/docs) for usage and the
-[installation guide](https://www.superlogical.com/rex/docs/installation) for current
-platform availability.
-
 ## What does Rex navigator add?
 
 Rex navigator is an unofficial Lua extension for Rex. It adds fuzzy session and
@@ -95,7 +89,7 @@ rex-navigator/
 Personal configuration and keybindings belong to the host. Session history is
 kept in the plugin's gitignored `state/` directory; it is never committed.
 
-## Loading and packaging
+## Installation
 
 Clone this repository anywhere and symlink it under your Rex configuration root:
 
@@ -127,8 +121,8 @@ rex.bind("ctrl+a>enter", "last_used_session")
 
 Requiring the module alone has no effects. `setup()` registers
 `open_session_picker`, `open_project_picker`, and `last_used_session`; the host's
-configuration owns bindings. Call setup once per configuration load. An optional
-`{ root = "/absolute/path" }` overrides code-root discovery.
+configuration owns bindings. Call setup once per configuration load. The plugin
+discovers its installation directory automatically.
 
 Rex uses `>` to separate keys in a sequence: `ctrl+a>f` means **Ctrl+A → f**.
 You can change the prefix, use another sequence, or bind an action to a single
@@ -155,8 +149,7 @@ Neither `navigation-config.lua` nor `projects.json` is needed for this installat
 `depth` must be a positive integer. Root directories themselves are not candidates:
 depth 1 lists their immediate child directories. Missing/unusable roots warn and
 are skipped. Hidden directories and directory symlinks are always skipped.
-`exclude` is a list of directory names, at any traversal depth. Omitting it uses
-`node_modules`, `vendor`, and `__pycache__`; `{}` explicitly disables those defaults.
+`exclude` is a list of directory names, at any traversal depth, e.g. `node_modules`.
 
 Settings are validated during setup and copied directly to the short-lived
 project worker; no generated configuration file is written. Reload your Rex

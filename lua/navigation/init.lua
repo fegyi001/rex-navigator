@@ -1,6 +1,6 @@
 -- Importable entrypoint. Requiring it does not register actions or run commands.
 local source = debug.getinfo(1, "S").source:gsub("^@", "")
-local default_root = assert(source:match("^(.*)/lua/navigation/[^/]+$"), "Could not locate Rex navigation root")
+local root = assert(source:match("^(.*)/lua/navigation/[^/]+$"), "Could not locate Rex navigation root")
 local namespace = (...):gsub("%.init$", "")
 local M, configured = {}, false
 
@@ -8,7 +8,6 @@ function M.setup(options)
   assert(not configured, "Rex navigation setup must be called only once per config load")
   options = options or {}
   assert(type(options) == "table", "navigation options must be a table")
-  local root = options.root or default_root
   assert(root:sub(1, 1) == "/", "Rex navigation root must be absolute")
   local project_arguments = {}
   if options.projects ~= nil then
