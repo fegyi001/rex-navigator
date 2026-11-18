@@ -46,8 +46,8 @@ test("Rex accepts the plugin action names and bindings without reloading its con
   const init = join(config, "init.lua");
   writeFileSync(init, `
 require("rex-navigator").setup()
-rex.bind("ctrl+a>f", "rex_navigator_open_project_picker")
-rex.bind("ctrl+a>space", "rex_navigator_open_session_picker")
+rex.bind("ctrl+a>f", "rex_navigator_create_session")
+rex.bind("ctrl+a>space", "rex_navigator_switch_session")
 rex.bind("ctrl+a>enter", "rex_navigator_last_used_session")
 `);
   const result = spawnSync(realRex, ["--autostart=false", "config", "check", init], {

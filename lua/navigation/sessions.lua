@@ -151,7 +151,7 @@ function Sessions:pick(context)
     preview,
     "--preview-window=right,50%",
     "--bind=ctrl-u:preview-page-up,ctrl-d:preview-page-down",
-    "--prompt=Session > ",
+    "--prompt=Select session > ",
     "--border",
     "--header=Enter: switch session | Esc: cancel | Ctrl+U/D: scroll preview",
   }, { stdin = table.concat(input), timeout = false, env = self.R:picker_env() })

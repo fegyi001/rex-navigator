@@ -66,8 +66,8 @@ for name in pairs(actions) do
   action_count = action_count + 1
 end
 assert(action_count == 3, "plugin must register exactly its three prefixed actions")
-local session_picker = assert(actions["rex_navigator_open_session_picker"])
-local project_picker = assert(actions["rex_navigator_open_project_picker"])
+local session_picker = assert(actions["rex_navigator_switch_session"])
+local project_picker = assert(actions["rex_navigator_create_session"])
 local last_used = assert(actions["rex_navigator_last_used_session"])
 local ctx = { client_id = "client:mac", session_id = "session:a", block_id = "block:source" }
 session_picker.run(ctx)

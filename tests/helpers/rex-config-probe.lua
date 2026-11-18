@@ -2,7 +2,7 @@ local config = require("lua.navigation.config")
 if rex.args.operation == "action" then
   local command
   rex.action = function(action)
-    if action.name == "rex_navigator_open_project_picker" then
+    if action.name == "rex_navigator_create_session" then
       command = action.run
     end
   end

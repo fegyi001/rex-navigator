@@ -1,6 +1,6 @@
 # `rex-navigator`
 
-> Improved session and project navigation for the Rex terminal multiplexer.
+> Improved session navigation for the Rex terminal multiplexer.
 
 <a href="https://github.com/fegyi001/rex-navigator">
   <img src="assets/rex-navigator-logo.png" alt="rex-navigator logo" width="160" height="160">
@@ -37,7 +37,7 @@ next key. **Ctrl+A → f** means Ctrl+A followed by lowercase `f`.
 
 ### Create new session
 
-Use `rex_navigator_open_project_picker` (example: **Ctrl+A → f**) to search your configured
+Use `rex_navigator_create_session` (example: **Ctrl+A → f**) to search your configured
 project directories. Type to filter, then press **Enter** to create or reuse the
 project's Rex session and switch to it. Press **Esc** to cancel.
 
@@ -45,7 +45,7 @@ project's Rex session and switch to it. Press **Esc** to cancel.
 
 ### Switch to an existing session
 
-Use `rex_navigator_open_session_picker` (example: **Ctrl+A → Space**) to filter existing sessions
+Use `rex_navigator_switch_session` (example: **Ctrl+A → Space**) to filter existing sessions
 by name and view a terminal preview. The last-used session comes first. Press **Enter** to switch, or **Esc** to cancel.
 
 ![Session picker showing the last-used session and a terminal preview](assets/session-picker.png)
@@ -94,8 +94,8 @@ require("rex-navigator").setup({
 })
 
 -- Example bindings: Ctrl+A is the prefix; choose your own keys or sequences.
-rex.bind("ctrl+a>space", "rex_navigator_open_session_picker")
-rex.bind("ctrl+a>f", "rex_navigator_open_project_picker")
+rex.bind("ctrl+a>space", "rex_navigator_switch_session")
+rex.bind("ctrl+a>f", "rex_navigator_create_session")
 rex.bind("ctrl+a>enter", "rex_navigator_last_used_session")
 ```
 
