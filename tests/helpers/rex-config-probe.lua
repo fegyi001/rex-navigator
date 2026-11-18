@@ -1,4 +1,12 @@
 local config = require("lua.navigation.config")
+if rex.args.operation == "setup" then
+  local count = 0
+  rex.action = function()
+    count = count + 1
+  end
+  local ok, err = pcall(require("lua.navigation").setup, rex.args.options)
+  return { ok = ok, error = tostring(err), actions = count }
+end
 if rex.args.operation == "action" then
   local command
   rex.action = function(action)
@@ -25,4 +33,9 @@ if rex.args.operation == "action" then
 end
 -- Rex's automatic return encoder loses empty-array shape; exercise the same
 -- strict transport encoder used by setup() when crossing the worker boundary.
-return { encoded = require("lua.navigation.json").encode(config.resolve(rex.args.options)) }
+local projects = rex.args.options.projects
+if rex.args.sparse_roots then
+  projects.roots[2] = projects.roots[1]
+  projects.roots[1] = nil
+end
+return { encoded = require("lua.navigation.json").encode({ projects = config.validate_projects(projects) }) }

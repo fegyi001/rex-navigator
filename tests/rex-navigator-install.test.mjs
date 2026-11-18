@@ -45,7 +45,7 @@ test("Rex accepts the plugin action names and bindings without reloading its con
   symlinkSync(root, join(config, "rex-navigator"));
   const init = join(config, "init.lua");
   writeFileSync(init, `
-require("rex-navigator").setup()
+require("rex-navigator").setup({ window = { width = 0.8, height = 0.5 } })
 rex.bind("ctrl+a>f", "rex_navigator_create_session")
 rex.bind("ctrl+a>space", "rex_navigator_switch_session")
 rex.bind("ctrl+a>enter", "rex_navigator_last_used_session")

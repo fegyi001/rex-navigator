@@ -9,7 +9,6 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { installLegacyLua } from "./helpers/rex-legacy-lua.mjs";
-import { luaLiteral } from "./helpers/lua-config.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const launcher = join(root, "scripts/navigation.sh");
@@ -37,12 +36,10 @@ function fixture(t) {
     sessions: [{ session_id: "session:a", label: "source" }], views: {}, processes: {},
   };
   const fakeConfig = join(home, "fake-config.json");
-  const projectsFile = join(rexConfig, "navigation-config.lua");
   const state = join(home, "state/rex/project-sessions.json");
   const history = join(home, "plugin/state/session-history.json");
   const update = () => {
     writeFileSync(fakeConfig, JSON.stringify(config));
-    writeFileSync(projectsFile, "return " + luaLiteral({ projects: settings }));
   };
   const fakeRex = join(home, "fake-rex.mjs");
   writeFileSync(fakeRex, `
@@ -98,7 +95,7 @@ function fixture(t) {
   };
   const lua = installLegacyLua({ home, bin, env, fakeRex, root });
   const args = (directory) => [
-    ...(directory === undefined ? [] : [directory]), "--config", projectsFile,
+    ...(directory === undefined ? [] : [directory]), "--projects-json", JSON.stringify(settings),
     ...(config.explicitClient ? ["--client", config.client] : []),
   ];
   const run = (directory, overrides = {}) => {

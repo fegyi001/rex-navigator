@@ -17,11 +17,11 @@ local function main()
     end
     if directory == nil then
       local serialized = os.getenv("REX_NAVIGATION_PROJECTS")
-      local overrides
+      local projects
       if serialized then
-        overrides = require("lua.navigation.json").decode(serialized)
+        projects = require("lua.navigation.json").decode(serialized)
       end
-      directory = P:pick(os.getenv("REX_PICKER_CONFIG"), overrides)
+      directory = P:pick(projects)
       if directory == nil then
         return
       end

@@ -9,9 +9,9 @@ function M.new(R, S)
   return setmetatable({ R = R, S = S }, Projects)
 end
 
-function Projects:pick(config_path, overrides)
+function Projects:pick(projects)
   local R = self.R
-  local config = require("lua.navigation.config").resolve({ config = config_path, projects = overrides }).projects
+  local config = require("lua.navigation.config").validate_projects(projects)
   local exclude = config.exclude
   local roots = {}
   for _, root in ipairs(config.roots) do
@@ -23,7 +23,7 @@ function Projects:pick(config_path, overrides)
     end
   end
   local paths = R:discover(roots, exclude)
-  assert(#paths > 0, "No project directories found. Check your navigation-config.lua project roots.")
+  assert(#paths > 0, "No project directories found. Check the project roots in setup({ projects = ... }).")
   local allowed = {}
   for _, path in ipairs(paths) do
     allowed[path] = true

@@ -6,7 +6,8 @@ if request.operation == "project" then
   local P = require("lua.navigation.projects").new(R, S)
   local directory = request.directory
   if directory == nil then
-    directory = P:pick(request.config)
+    local projects = request.projects_json and require("lua.navigation.json").decode(request.projects_json)
+    directory = P:pick(projects)
     if directory == nil then
       return
     end

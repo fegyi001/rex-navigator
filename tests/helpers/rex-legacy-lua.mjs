@@ -32,9 +32,10 @@ exec ${quote(process.execPath)} ${quote(fakeRex)} "$@"
     },
     invocation(kind, argv) {
       const request = { operation: kind === "session" ? argv[0] : "project" };
-      const names = { "--client": "client", "--current": "current", "--session": "session", "--config": "config" };
+      const names = { "--client": "client", "--current": "current", "--session": "session" };
       for (let i = kind === "session" ? 1 : 0; i < argv.length; i++) {
-        if (names[argv[i]]) request[names[argv[i]]] = argv[++i];
+        if (argv[i] === "--projects-json") request.projects_json = argv[++i];
+        else if (names[argv[i]]) request[names[argv[i]]] = argv[++i];
         else if (argv[i] === "--picker-tab") request.picker_tab = true;
         else if (kind === "project" && !argv[i].startsWith("--")) request.directory = argv[i];
         else throw new Error(`Unknown test argument ${argv[i]}`);

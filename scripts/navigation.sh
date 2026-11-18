@@ -9,7 +9,7 @@ usage() {
   if [ "$kind" = session ]; then
     echo 'Usage: navigation.sh session {pick,toggle,select} --client CLIENT --current SESSION [--session TARGET] [--picker-tab]'
   else
-    echo 'Usage: navigation.sh project [DIRECTORY] [--config FILE] [--client CLIENT] [--picker-tab]'
+    echo 'Usage: navigation.sh project [DIRECTORY] [--projects-json JSON] [--client CLIENT] [--picker-tab]'
   fi
   exit 0
 }
@@ -27,7 +27,6 @@ set_option() {
     --client) REX_PICKER_CLIENT=$2; export REX_PICKER_CLIENT ;;
     --current) REX_PICKER_CURRENT=$2; export REX_PICKER_CURRENT ;;
     --session) [ "$kind" = session ] || die 'Unknown option --session'; REX_PICKER_SESSION=$2; export REX_PICKER_SESSION ;;
-    --config) [ "$kind" = project ] || die 'Unknown option --config'; REX_PICKER_CONFIG=$2; export REX_PICKER_CONFIG ;;
     --projects-json) [ "$kind" = project ] || die 'Unknown option --projects-json'; REX_NAVIGATION_PROJECTS=$2; export REX_NAVIGATION_PROJECTS ;;
     *) die "Unknown option $1" ;;
   esac
@@ -54,7 +53,7 @@ while [ "$#" -gt 0 ]; do
     --picker-tab) REX_PICKER_TAB=1; export REX_PICKER_TAB; shift ;;
     --) shift; while [ "$#" -gt 0 ]; do positional "$1"; shift; done ;;
     --*=*) option=${1%%=*}; value=${1#*=}; set_option "$option" "$value"; shift ;;
-    --client|--current|--session|--config|--projects-json)
+    --client|--current|--session|--projects-json)
       [ "$#" -ge 2 ] || die "Missing value for $1"
       case "$2" in -?*) die "Missing or ambiguous value for $1; use $1=VALUE for a leading dash" ;; esac
       set_option "$1" "$2"; shift 2 ;;

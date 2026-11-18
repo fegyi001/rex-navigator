@@ -1,4 +1,4 @@
--- Trusted host-owned Lua configuration, shared by actions and CLI workers.
+-- Inline settings validation; project settings also cross the worker boundary.
 local namespace = (...):match("^(.*)%.config$")
 local json = require(namespace .. ".json")
 local M = {}
@@ -20,7 +20,27 @@ local function list(value, name)
   return count
 end
 
+function M.validate_window(window)
+  if window == nil then
+    window = {}
+  end
+  assert(type(window) == "table" and window ~= json.null, "window must be a table")
+  local function dimension(name, default)
+    local value = window[name]
+    if value == nil then
+      return default
+    end
+    assert(
+      type(value) == "number" and value > 0 and value <= 1,
+      "window." .. name .. " must be a number greater than 0 and at most 1"
+    )
+    return value
+  end
+  return { width = dimension("width", 0.7), height = dimension("height", 0.6) }
+end
+
 function M.validate_projects(projects)
+  assert(projects ~= nil, "Configure project discovery with setup({ projects = ... })")
   assert(type(projects) == "table" and projects ~= json.null, "configuration.projects must be a table")
   assert(list(projects.roots, "projects.roots") > 0, "projects must contain a nonempty roots list")
   local roots = json.array()
@@ -47,35 +67,6 @@ function M.validate_projects(projects)
     exclusions[#exclusions + 1] = name
   end
   return json.object({ roots = roots, exclude = exclusions })
-end
-
-function M.default_path()
-  local home = os.getenv("XDG_CONFIG_HOME")
-  if not home or home == "" then
-    home = assert(os.getenv("HOME"), "HOME is not set") .. "/.config"
-  end
-  return home .. "/rex/navigation-config.lua"
-end
-
-function M.load(path)
-  path = path or M.default_path()
-  assert(nonempty(path), "configuration path must be a nonempty string")
-  local chunk, err = loadfile(path)
-  assert(chunk, "Could not load navigation configuration " .. path .. ": " .. tostring(err))
-  local ok, value = pcall(chunk)
-  assert(ok, "Could not execute navigation configuration " .. path .. ": " .. tostring(value))
-  assert(type(value) == "table", "Navigation configuration " .. path .. " must return a table")
-  return value
-end
-
-function M.resolve(options)
-  options = options or {}
-  assert(type(options) == "table", "navigation options must be a table")
-  local projects = options.projects
-  if projects == nil then
-    projects = M.load(options.config).projects
-  end
-  return json.object({ projects = M.validate_projects(projects) })
 end
 
 return M

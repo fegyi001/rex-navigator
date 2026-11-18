@@ -8,15 +8,14 @@ function M.setup(options)
   assert(not configured, "Rex navigation setup must be called only once per config load")
   options = options or {}
   assert(type(options) == "table", "navigation options must be a table")
+  assert(options.config == nil, "File-based configuration is not supported; use setup({ projects = ... })")
   assert(root:sub(1, 1) == "/", "Rex navigation root must be absolute")
+  local config = require(namespace .. ".config")
+  local window = config.validate_window(options.window)
   local project_arguments = {}
   if options.projects ~= nil then
-    local config = require(namespace .. ".config")
     local json = require(namespace .. ".json")
     project_arguments = { "--projects-json", json.encode(config.validate_projects(options.projects)) }
-  elseif options.config ~= nil then
-    assert(type(options.config) == "string" and options.config:sub(1, 1) == "/", "configuration path must be absolute")
-    project_arguments = { "--config", options.config }
   end
   local function command(kind, operation, ctx)
     assert(ctx.client_id, "Open the picker from a Rex app")
@@ -57,7 +56,7 @@ function M.setup(options)
     local layer, err = rex.session.new_layer({
       session_id = ctx.session_id,
       window_id = window_id,
-      bounds = { 0.15, 0.2, 0.7, 0.6 },
+      bounds = { (1 - window.width) / 2, (1 - window.height) / 2, window.width, window.height },
       focus = true,
       layout = rex.layout.block({ flavor = "com.superlogical.terminal.shell", options = terminal }),
     })

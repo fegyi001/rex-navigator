@@ -77,7 +77,13 @@ assert(#described == 1 and described[1].block_id == ctx.block_id)
 assert(layers[1].window_id == "window:source", "use invoking pane's window rather than server-active window")
 assert(layers[1].focus == true, "floating picker must focus automatically")
 local bounds = layers[1].bounds
-assert(#bounds == 4 and bounds[1] == 0.15 and bounds[2] == 0.2 and bounds[3] == 0.7 and bounds[4] == 0.6)
+assert(
+  #bounds == 4
+    and math.abs(bounds[1] - 0.15) < 1e-12
+    and math.abs(bounds[2] - 0.2) < 1e-12
+    and bounds[3] == 0.7
+    and bounds[4] == 0.6
+)
 assert(layers[1].layout.flavor == "com.superlogical.terminal.shell")
 local exit = layers[1].layout.options.exit
 assert(
@@ -139,8 +145,8 @@ assert(project_layer.focus == true, "project picker must focus automatically")
 local project_bounds = project_layer.bounds
 assert(
   #project_bounds == 4
-    and project_bounds[1] == 0.15
-    and project_bounds[2] == 0.2
+    and math.abs(project_bounds[1] - 0.15) < 1e-12
+    and math.abs(project_bounds[2] - 0.2) < 1e-12
     and project_bounds[3] == 0.7
     and project_bounds[4] == 0.6
 )

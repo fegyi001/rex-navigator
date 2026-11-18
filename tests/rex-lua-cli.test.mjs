@@ -106,7 +106,7 @@ test("an option missing its value cannot consume another flag and open an uninte
   const f = cliFixture(t);
   const directory = join(f.home, "must-not-open");
   mkdirSync(directory);
-  const result = f.run("project", ["--config", "--client", directory]);
+  const result = f.run("project", ["--projects-json", "--client", directory]);
   assert.notEqual(result.status, 0);
   assert.equal(existsSync(join(f.home, "selected.jsonl")), false);
   assert.equal(existsSync(join(f.home, "pure-created.json")), false);

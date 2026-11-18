@@ -60,8 +60,8 @@ session-switching actions do not update this history. See
 
 ## Requirements
 
-- macOS and Rex with the `rex.exec.start`/process-handle Lua functions. Enable
-  Rex Remote Control so the plugin can select sessions in the app.
+- macOS and Rex with the `rex.exec.start`/process-handle Lua functions. **Enable
+  Rex Remote Control so the plugin can select sessions in the app.**
 - fzf and the macOS tools `lockf`, `find`, `sort`, `realpath`, `openssl`, `mktemp`,
   and `dd` with `conv=fsync` support. Linux and Windows support is not implemented.
 
@@ -127,31 +127,35 @@ use symlinks as configured roots; the plugin resolves and deduplicates those roo
 Overlapping roots do not produce duplicate candidates.
 
 Setup validates inline settings before registering actions and passes them to
-workers without writing a generated config file. You can use the session actions
-without project settings.
+workers without writing a generated config file. Configure projects through
+`setup({ projects = ... })`; the plugin does not load separate configuration files.
+You can use the session actions without project settings. Project discovery
+requires a nonempty `projects.roots` list.
 
-### Optional file-based configuration
+### Floating window size
 
-If you prefer a separate file, pass its path instead of inline project settings:
+Set `window.width` and `window.height` to fractions of the invoking tab's size.
+Both pickers use these settings and stay centered. Omit either value to use its
+default: `0.7` width and `0.6` height. Values must be numbers greater than `0` and
+at most `1`.
 
 ```lua
 require("rex-navigator").setup({
-  config = "/absolute/path/navigation-config.lua",
+  window = { width = 0.8, height = 0.7 },
+  projects = {
+    roots = { { path = "~/code", depth = 2 } },
+  },
 })
 ```
 
-Use a trusted Lua file that returns `{ projects = { roots = ..., exclude = ... } }`.
-The plugin executes it on each discovery invocation. Missing or invalid settings
-stop discovery before project operations. Inline `projects` takes precedence over
-`config`. If you omit both, discovery uses `$XDG_CONFIG_HOME/rex/navigation-config.lua`
-or `~/.config/rex/navigation-config.lua`. The inline installation above needs no
-separate file.
+Add `window` to your existing `setup()` call; do not call setup a second time.
 
 ## Picker behavior
 
-Both pickers open a centered pane at 70% of the invoking tab's width and 60% of its
-height, with focus. Selecting a result or pressing Esc closes it; neither picker
-creates a temporary tab. For picker errors, press Enter to dismiss the pane.
+Both pickers open a centered pane with focus. The default size is 70% of the
+invoking tab's width and 60% of its height. Selecting a result or pressing Esc
+closes it; neither picker creates a temporary tab. For picker errors, press Enter
+to dismiss the pane.
 Rex reports toggle errors through the action.
 
 The session picker excludes the current session. After the last-used destination,
