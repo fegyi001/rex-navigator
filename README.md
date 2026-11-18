@@ -144,7 +144,8 @@ separate file.
 
 Both pickers open a centered pane at 70% of the invoking tab's width and 60% of its
 height, with focus. Selecting a result or pressing Esc closes it; neither picker
-creates a temporary tab. If an error occurs, press Enter to dismiss it.
+creates a temporary tab. For picker errors, press Enter to dismiss the pane.
+Rex reports toggle errors through the action.
 
 The session picker excludes the current session. After the last-used destination,
 it lists sessions in case-insensitive alphabetical order, with full IDs as tie
@@ -170,7 +171,8 @@ Preview limits:
 - Shell snapshots read a 32 KiB tail and display up to 200 lines within the available
   preview rows. Alternate-screen snapshots read the head with a 32 KiB encoded-byte
   budget and keep up to 200 lines for scrolling.
-- Alternate-screen previews show `[Preview truncated]` at byte or line limits.
+- Alternate-screen previews show `[Preview truncated]` if byte or line limits cut
+  off content.
   The worker strips terminal control sequences and keeps no disk cache.
 
 Previews do not switch sessions, send terminal input, or write history. The worker
@@ -249,7 +251,7 @@ tools/            Development tools, including the Unicode data generator
 
 `navigation.sh` starts the Lua worker. `lock-transaction.sh` keeps the kernel lock
 in the writer process; `process-group.sh` cleans up subprocess groups on timeout
-or cancellation.
+or cancellation. The plugin starts workers on demand and runs no persistent daemon.
 
 ## Tests
 
