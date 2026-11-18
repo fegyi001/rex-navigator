@@ -14,7 +14,7 @@ includes [Mitchell Hashimoto](https://mitchellh.com/), creator of
 ## What is `rex-navigator`
 
 `rex-navigator` is an unofficial Rex extension that provides some missing/improved
-session and project navigation features.
+session navigation features.
 
 ## Features
 
@@ -25,8 +25,8 @@ Use `rex-navigator` to:
 - quickly switch back-and-forth your last-used session
 
 The pickers open in focused floating panes over your
-current tab. This unofficial extension uses Rex's embedded Lua and fzf; you don't
-need Node.js or a standalone Lua installation to use it.
+current tab. It uses Rex's embedded Lua and fzf; you don't
+need to install anything to use it.
 
 **The action keybindings below are examples.** Choose your own Rex-supported keys
 or key sequences in `init.lua`. The examples use **Ctrl+A as a prefix key** to
