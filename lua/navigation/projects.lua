@@ -34,7 +34,7 @@ function Projects:pick(config_path, overrides)
     "--print0",
     "--no-multi",
     "--layout=reverse",
-    "--prompt=Project > ",
+    "--prompt=Create session > ",
     "--border",
     "--header=Enter: open workspace | Esc: cancel",
   }, { timeout = false, stdin = table.concat(paths, "\0") .. "\0", env = R:picker_env() })

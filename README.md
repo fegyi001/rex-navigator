@@ -20,8 +20,13 @@ session and project navigation features.
 
 ## Features
 
-Use `rex-navigator` to find project directories, switch sessions, and return to
-your last-used session. The pickers open in focused floating panes over your
+Use `rex-navigator` to:
+
+- create new sessions (based on your favorite directories)
+- switch to an existing session
+- quickly switch back-and-forth your last-used session
+
+The pickers open in focused floating panes over your
 current tab. This unofficial extension uses Rex's embedded Lua and fzf; you don't
 need Node.js or a standalone Lua installation to use it.
 
@@ -30,19 +35,18 @@ or key sequences in `init.lua`. The examples use **Ctrl+A as a prefix key** to
 match the author's previous tmux setup: press Ctrl+A, release it, then press the
 next key. **Ctrl+A → f** means Ctrl+A followed by lowercase `f`.
 
-### Project picker
+### Create new session
 
-Run `rex_navigator_open_project_picker` (example: **Ctrl+A → f**) to search your configured
+Use `rex_navigator_open_project_picker` (example: **Ctrl+A → f**) to search your configured
 project directories. Type to filter, then press **Enter** to create or reuse the
 project's Rex session and switch to it. Press **Esc** to cancel.
 
 ![Project picker showing project directories in a floating Rex pane](assets/project-picker.png)
 
-### Session picker
+### Switch to an existing session
 
-Run `rex_navigator_open_session_picker` (example: **Ctrl+A → Space**) to filter existing sessions
-by name and view a read-only terminal preview. The last-used session comes first,
-marked `(last used)`. Press **Enter** to switch, or **Esc** to cancel.
+Use `rex_navigator_open_session_picker` (example: **Ctrl+A → Space**) to filter existing sessions
+by name and view a terminal preview. The last-used session comes first. Press **Enter** to switch, or **Esc** to cancel.
 
 ![Session picker showing the last-used session and a terminal preview](assets/session-picker.png)
 
