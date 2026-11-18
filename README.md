@@ -2,8 +2,8 @@
 
 > Improved session and project navigation for the Rex terminal multiplexer.
 
-<a href="https://www.superlogical.com">
-  <img src="assets/rex-logo.png" alt="Rex Beta logo" width="128" height="128">
+<a href="https://github.com/fegyi001/rex-navigator">
+  <img src="assets/rex-navigator-logo.png" alt="rex-navigator logo" width="160" height="160">
 </a>
 
 ## About Rex
@@ -15,10 +15,8 @@ includes [Mitchell Hashimoto](https://mitchellh.com/), creator of
 
 ## What is `rex-navigator`
 
-`rex-navigator` is an unofficial Rex extension that provides a fuzzy-search
-interface for switching between sessions and project directories. It uses Rex's
-embedded Lua and fzf to provide a fast, keyboard-driven workflow for navigating
-your projects and sessions.
+`rex-navigator` is an unofficial Rex extension that provides some missing/improved
+session and project navigation features.
 
 ## Features
 
@@ -285,5 +283,6 @@ version. The plugin does not run the generator at startup.
 
 ## License
 
-Use the code and documentation under the [MIT license](LICENSE). Superlogical
-owns the Rex logo in `assets/rex-logo.png`; this license does not cover that asset.
+Use the code and documentation under the [MIT license](LICENSE). The project logo
+incorporates Rex artwork from Superlogical. This license does not cover that
+third-party artwork or Rex branding.
