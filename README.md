@@ -1,5 +1,7 @@
 # Rex navigator
 
+> Lua plugin for improved session/project navigation in Rex terminal multiplexer
+
 <a href="https://www.superlogical.com">
   <img src="assets/rex-logo.png" alt="Rex Beta logo" width="128" height="128">
 </a>
