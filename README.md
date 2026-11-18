@@ -1,7 +1,5 @@
 # `rex-navigator`
 
-> Improved session navigation for the Rex terminal multiplexer.
-
 <a href="https://github.com/fegyi001/rex-navigator">
   <img src="assets/rex-navigator-logo.png" alt="rex-navigator logo" width="160" height="160">
 </a>
