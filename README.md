@@ -7,11 +7,7 @@
 ## What is Rex?
 
 [Rex](https://www.superlogical.com/rex/docs) is a terminal multiplexer from
-[Superlogical](https://www.superlogical.com), whose team includes
-[Mitchell Hashimoto](https://mitchellh.com), creator of Ghostty and co-founder of
-HashiCorp. It organizes terminals into long-lived sessions, so you can close a
-client, reconnect from another device, and resume your work without starting your
-terminals again.
+[Superlogical](https://www.superlogical.com).
 
 You can customize Rex with Lua configuration, keybindings, and custom actions, or
 automate it through its CLI and server API. Rex is currently in beta; see the
