@@ -1,107 +1,78 @@
 # `rex-navigator`
 
-> Lua plugin for improved session/project navigation in Rex terminal multiplexer
+> Session and project navigation for the Rex terminal multiplexer.
 
 <a href="https://www.superlogical.com">
   <img src="assets/rex-logo.png" alt="Rex Beta logo" width="128" height="128">
 </a>
 
-## What is Rex?
+## About Rex
 
-[Rex](https://www.superlogical.com/rex/docs) is a terminal multiplexer from [Superlogical](https://www.superlogical.com) created by [Mitchell Hashimoto](https://mitchellh.com/), creator of [Ghostty](https://ghostty.org/)
-.
+[Superlogical](https://www.superlogical.com) builds
+[Rex](https://www.superlogical.com/rex/docs), a terminal multiplexer. The team
+includes [Mitchell Hashimoto](https://mitchellh.com/), creator of
+[Ghostty](https://ghostty.org/).
 
-## What does `rex-navigator` add?
+## Features
 
-`rex-navigator` is an unofficial Lua extension for Rex. It adds fuzzy session and
-project pickers, last-used session switching, and read-only terminal previews in
-focused floating panes. You configure it through `require("rex-navigator").setup()`
-in your Rex `init.lua` and open its actions with your chosen keybindings.
+Use `rex-navigator` to find project directories, switch sessions, and return to
+your last-used session. The pickers open in focused floating panes over your
+current tab. This unofficial extension uses Rex's embedded Lua and fzf; you don't
+need Node.js or a standalone Lua installation to use it.
 
-**The Rex action keybindings in this README are examples, not plugin defaults.**
-Bind the actions to any keys or key sequences supported by Rex in your `init.lua`.
-The examples use **Ctrl+A as a prefix key**, matching the author's previous tmux
-configuration: press **Ctrl+A**, release it, then press the next key.
-For example, **Ctrl+A → f** means Ctrl+A followed by lowercase `f`.
-
-All navigation logic runs in **Rex's embedded Lua**, with fzf for the interface.
-You do not need Node.js, a standalone Lua installation, npm packages, or a build
-step to use it. This project is not an official Superlogical product or Rex plugin
-format. The Rex logo above identifies the application this extension works with.
+**The action keybindings below are examples.** Choose your own Rex-supported keys
+or key sequences in `init.lua`. The examples use **Ctrl+A as a prefix key** to
+match the author's previous tmux setup: press Ctrl+A, release it, then press the
+next key. **Ctrl+A → f** means Ctrl+A followed by lowercase `f`.
 
 ### Project picker
 
-With the example keybindings below, press **Ctrl+A → f** to open the project picker.
-Type to filter your configured project directories, then press **Enter** to create
-or reuse the project's Rex session and switch to it. Press **Esc** to cancel.
+Run `open_project_picker` (example: **Ctrl+A → f**) to search your configured
+project directories. Type to filter, then press **Enter** to create or reuse the
+project's Rex session and switch to it. Press **Esc** to cancel.
 
 ![Project picker showing project directories in a floating Rex pane](assets/project-picker.png)
 
 ### Session picker
 
-With the example keybindings below, press **Ctrl+A → Space** to open the session picker.
-Filter existing sessions by name and view a read-only terminal preview on the
-right. The last-used session appears first, marked `(last used)`. Press **Enter**
-to switch, or **Esc** to cancel.
+Run `open_session_picker` (example: **Ctrl+A → Space**) to filter existing sessions
+by name and view a read-only terminal preview. The last-used session comes first,
+marked `(last used)`. Press **Enter** to switch, or **Esc** to cancel.
 
 ![Session picker showing the last-used session and a terminal preview](assets/session-picker.png)
 
 ### Last-used session
 
-Use the `last_used_session` action to return to the last-used session without
-opening a picker. With the example keybindings below, press **Ctrl+A → Enter**.
-Press it again to switch back: after moving from session A to B through either
-picker, repeated toggles take you **B → A → B → A**.
+Run `last_used_session` (example: **Ctrl+A → Enter**) to switch back without
+opening a picker. After a switch from A to B through either picker, repeat the
+action to toggle **B → A → B → A**.
 
-First switch to another session with the project picker or session picker to
-establish a history pair. Rex's sidebar and native session-switching actions do
-not update this history; see [History and limits](#history-and-limits) for details.
-You can bind this action to any Rex-supported shortcut or key sequence.
+Start by choosing another session with either picker. Rex's sidebar and native
+session-switching actions do not update this history. See
+[History and limits](#history-and-limits).
 
-## Layout
+## Requirements
 
-```text
-rex-navigator/
-├── README.md
-├── init.lua             # Public require("rex-navigator") entrypoint
-├── lua/
-│   └── navigation/       # Importable navigation module
-│       ├── init.lua      # setup(): register actions, no bindings
-│       ├── config.lua    # Project settings validation and optional file loading
-│       ├── sessions.lua  # Picker ordering and shared history
-│       ├── projects.lua  # Project discovery and session reuse/creation
-│       ├── preview.lua   # Bounded read-only snapshots
-│       ├── runtime.lua   # Rex/process/filesystem adapters
-│       ├── json.lua      # Strict state/worker-transport JSON handling
-│       ├── text.lua      # UTF-8 and terminal-control sanitation
-│       └── text-data.lua # Checked-in Unicode property ranges
-├── scripts/             # Short-lived Lua workers and POSIX bootstraps
-│   ├── navigation.sh     # CLI parsing and Rex lookup
-│   ├── navigation.lua    # Session/project dispatch and errors
-│   ├── transaction.lua  # Locked state-changing worker
-│   ├── lock-transaction.sh
-│   ├── process-group.sh # Bounded worker/descendant cleanup
-│   ├── session-preview.lua
-│   └── snapshot.lua
-└── tests/               # Isolated behavior/integration tests and helpers
-```
+- macOS and Rex with the `rex.exec.start`/process-handle Lua functions. Enable
+  Rex Remote Control so the plugin can select sessions in the app.
+- fzf and the macOS tools `lockf`, `find`, `sort`, `realpath`, `openssl`, `mktemp`,
+  and `dd` with `conv=fsync` support. Linux and Windows support is not implemented.
 
-Personal configuration and keybindings belong to the host. Session history is
-kept in the plugin's gitignored `state/` directory; it is never committed.
+The workers look for executables in PATH, Rex's managed macOS installation, and
+local/Homebrew locations. They do not source shell startup files.
 
 ## Installation
 
 Clone this repository anywhere and symlink it under your Rex configuration root:
 
 ```sh
-git clone <repository-url> ~/code/rex-navigator
+git clone https://github.com/fegyi001/rex-navigator.git ~/code/rex-navigator
 ln -s ~/code/rex-navigator ~/.config/rex/rex-navigator
 ```
 
-For a tracked configuration repository, a Git submodule at the same
-`rex-navigator` path can replace the symlink. Use your actual `$XDG_CONFIG_HOME`
-instead of `~/.config` if set. Then add setup and your chosen keybindings to the
-host `init.lua`:
+Use `$XDG_CONFIG_HOME` instead of `~/.config` if set. A Git submodule at the same
+`rex-navigator` path also works. Add this to your Rex `init.lua` and adjust the
+project roots and bindings:
 
 ```lua
 require("rex-navigator").setup({
@@ -119,47 +90,42 @@ rex.bind("ctrl+a>f", "open_project_picker")
 rex.bind("ctrl+a>enter", "last_used_session")
 ```
 
-Requiring the module alone has no effects. `setup()` registers
-`open_session_picker`, `open_project_picker`, and `last_used_session`; the host's
-configuration owns bindings. Call setup once per configuration load. The plugin
-discovers its installation directory automatically.
+Call `setup()` once per configuration load to register the three actions. Importing
+the module alone has no effects. Keep your settings and bindings in `init.lua`;
+the plugin locates its own workers without an extra config file or PATH change.
 
-Rex uses `>` to separate keys in a sequence: `ctrl+a>f` means **Ctrl+A → f**.
-You can change the prefix, use another sequence, or bind an action to a single
-shortcut. See Rex's [key sequences](https://www.superlogical.com/rex/docs/customize/key-sequences)
-and [keyboard shortcuts](https://www.superlogical.com/rex/docs/customize/keyboard-shortcuts) documentation.
+Rex uses `>` between keys in a sequence: `ctrl+a>f` means **Ctrl+A → f**. Choose a
+different prefix, another sequence, or a single shortcut. See Rex's
+[key sequences](https://www.superlogical.com/rex/docs/customize/key-sequences) and
+[keyboard shortcuts](https://www.superlogical.com/rex/docs/customize/keyboard-shortcuts)
+documentation. The plugin leaves existing pane-navigation bindings alone.
 
-That's the complete plugin setup: **no extra config file, shell command, or PATH
-change is required**. The project picker opens through the registered action
-(Ctrl+A → f in this example) and receives the settings supplied to `setup()`.
+After editing `init.lua`, reload the configuration on the Rex server:
 
-Code and workers resolve their paths relative to their own root, not the current
-working directory. Personal settings stay in your host `init.lua`; session history
-is stored under the plugin root, and project associations use the host's XDG state path.
-
-The plugin does not bind keys or change existing pane navigation. No plugin
-manager or future Rex plugin API is assumed.
+```sh
+rex config reload
+```
 
 ## Configuration
 
-Pass your project settings directly to `setup({ projects = ... })` as shown above.
-Neither `navigation-config.lua` nor `projects.json` is needed for this installation.
+Configure project discovery in `setup({ projects = ... })`:
 
-`roots` must be a nonempty list. Paths must be absolute, `~`, or start with `~/`;
-`depth` must be a positive integer. Root directories themselves are not candidates:
-depth 1 lists their immediate child directories. Missing/unusable roots warn and
-are skipped. Hidden directories and directory symlinks are always skipped.
-`exclude` is a list of directory names, at any traversal depth, e.g. `node_modules`.
+- `roots`: a nonempty list of paths and traversal depths. Use an absolute path,
+  `~`, or `~/...`, with a positive integer `depth`. Depth 1 lists immediate child
+  directories, not the root itself. Unusable roots produce a warning.
+- `exclude`: directory names to skip at any depth, such as `node_modules`.
 
-Settings are validated during setup and copied directly to the short-lived
-project worker; no generated configuration file is written. Reload your Rex
-configuration after editing them. There are no machine-specific roots bundled
-with the plugin. Session-only actions do not need project settings.
+Discovery skips hidden child directories, files, and directory symlinks. You can
+use symlinks as configured roots; the plugin resolves and deduplicates those roots.
+Overlapping roots do not produce duplicate candidates.
+
+Setup validates inline settings before registering actions and passes them to
+workers without writing a generated config file. You can use the session actions
+without project settings.
 
 ### Optional file-based configuration
 
-This is an alternative, **not an installation requirement**. If you prefer to
-keep settings in a file, use:
+If you prefer a separate file, pass its path instead of inline project settings:
 
 ```lua
 require("rex-navigator").setup({
@@ -167,168 +133,123 @@ require("rex-navigator").setup({
 })
 ```
 
-The trusted Lua file must return `{ projects = { roots = ..., exclude = ... } }`.
-It is executed when discovery starts; invalid or missing configuration fails
-before project operations. With neither `projects` nor `config` supplied, discovery
-looks for `$XDG_CONFIG_HOME/rex/navigation-config.lua`, defaulting to
-`~/.config/rex/navigation-config.lua`. Inline `projects` always takes precedence.
+Use a trusted Lua file that returns `{ projects = { roots = ..., exclude = ... } }`.
+The plugin executes it on each discovery invocation. Missing or invalid settings
+stop discovery before project operations. Inline `projects` takes precedence over
+`config`. If you omit both, discovery uses `$XDG_CONFIG_HOME/rex/navigation-config.lua`
+or `~/.config/rex/navigation-config.lua`. The inline installation above needs no
+separate file.
 
-## Actions and example keybindings
+## Picker behavior
 
-The following bindings refer to the example configuration above. The plugin
-registers action names; you choose their bindings and whether to use a prefix.
+Both pickers open a centered pane at 70% of the invoking tab's width and 60% of its
+height, with focus. Selecting a result or pressing Esc closes it; neither picker
+creates a temporary tab. If an error occurs, press Enter to dismiss it.
 
-- **`open_session_picker`** (example: **Ctrl+A → Space**) opens an fzf session picker
-  in a focused floating pane over
-  the invoking tab, centered at 70% of its width and 60% of its height. It creates
-  no temporary tab. The current session is excluded; the last-used destination
-  comes first, marked `(last used)`, followed by other sessions alphabetically,
-  ignoring case. The left half lists sessions; the right half
-  previews a terminal text snapshot. Typing ranks matches by fuzzy relevance;
-  clearing the query restores last-used-first order.
-  Esc cancels and closes the pane; selecting a session switches and closes it.
-- **`open_project_picker`** (example: **Ctrl+A → f**) opens the project picker
-  in the same centered, focused 70% × 60%
-  floating pane. Esc cancels; opening a project closes the pane after creating
-  or reusing its session and switching to it. No temporary tab is created.
-- **`last_used_session`** (example: **Ctrl+A → Enter**) toggles the last two sessions
-  selected through either picker.
-
-Existing pane-navigation bindings stay under your control. For example, the
-author uses **Ctrl+A → l** for right-pane navigation; this plugin does not bind it.
-
-Reload through Rex's **Reload Config** command, or run `rex config reload`, to
-activate the Lua action registration. The plugin launches its own workers;
-no automatic reload is performed.
-Then switch from session A to B with either picker. With the example bindings, press **Ctrl+A → Enter**
-twice: it should return to A, then B.
-
-## Requirements
-
-Requirements are `fzf`, a Rex version with the documented `rex.exec.start`/handle
-Lua functions, and macOS built-ins including `lockf`, `find`, `sort`, `realpath`,
-`openssl`, `mktemp`, and `dd` with `conv=fsync` support. Linux/Windows portability
-is not implemented.
-
-The launchers share `scripts/navigation.sh`. Executable lookup checks PATH, Rex's
-managed macOS installation, and local/Homebrew locations, since app-launched
-actions may have a minimal PATH. It never sources shell startup files.
-Session IDs are hidden: the list shows names and the last-used marker only.
-Hidden IDs still identify selections safely when names are duplicated; use the
-preview to tell identical names apart. fzf's default colors are left unchanged.
-Session selection uses
-Rex Remote Control, which must be enabled in the app (the project picker
-already required it). Errors from the toggle are reported by the Rex action;
-picker errors remain visible in their floating pane until Enter is pressed.
+The session picker excludes the current session. After the last-used destination,
+it lists sessions in case-insensitive alphabetical order, with full IDs as tie
+breakers. Typing ranks fuzzy matches; clearing the query restores the initial
+order. Names and the last-used marker appear in the list, but IDs stay hidden.
+Use the preview to distinguish duplicate names. The plugin keeps fzf's default
+colors. With no other sessions, you see `No other sessions available`.
 
 ## Session snapshots
 
-Highlighting a session starts a read-only snapshot worker for its focused terminal
-in its active tab. The preview refreshes on highlight changes, not continuously;
-it is text, not an image of the whole session layout. Missing sessions, missing
-focus, non-terminal panes, and failed/slow requests show `Preview unavailable`
-without preventing selection. If no other sessions exist, the picker reports
-`No other sessions available` without changing history.
+Highlight a session to preview its focused terminal in the active tab. Shells show
+recent output; alternate-screen apps such as Neovim show the top of the screen.
+Use **Ctrl+U / Ctrl+D** inside fzf to page the snapshot. These controls do not send
+input to the target terminal. Wide layouts may not fit the text preview.
 
-Snapshots are screen-aware: ordinary shells show recent output, while alternate-
-screen apps such as Neovim are shown from the top instead of losing the upper
-part of the screen. Use **Ctrl+U / Ctrl+D** to page the preview up/down; these keys
-scroll fzf's snapshot only and never send input to the target terminal. The preview
-is plain text, not a rescaled screenshot, so wide editor layouts may not fit.
+Each highlight change starts a snapshot; the preview does not refresh between
+changes. Missing sessions, missing focus, non-terminal panes, and failed or slow
+requests show `Preview unavailable`. You can still select the session.
 
-Previews do not run before the list opens. A worker waits 75 ms for navigation to
-settle, has a two-second work budget, and terminates pending Rex children when
-cancelled. It retrieves a bounded 32 KiB tail for shell output, or a head with a
-32 KiB encoded-byte budget for alternate screens, rather than downloading all
-scrollback. Shell output is capped to 200 lines and the available preview rows;
-alternate-screen output keeps up to 200 lines for scrolling and shows
-`[Preview truncated]` if byte/line limits cut it short. Terminal control sequences
-are stripped. No snapshots are cached on disk, and previewing never switches
-sessions, sends input, or writes history.
+Preview limits:
 
-Snapshot RPCs use attach-aware Rex CLI reads with bounded stdout/stderr capture;
-native generic Lua RPC has no response-byte limit. Short-lived process groups and
-an owner-liveness guard clean up descendants even when Rex exits before signaling
-them. The guard checks every 50 ms while a bounded command runs; it is not a
-persistent daemon. Cleanup can finish shortly after the preview's Rex CLI exits.
+- Work starts after a 75 ms delay, once the list has opened, with a two-second budget.
+- Shell snapshots read a 32 KiB tail and display up to 200 lines within the available
+  preview rows. Alternate-screen snapshots read the head with a 32 KiB encoded-byte
+  budget and keep up to 200 lines for scrolling.
+- Alternate-screen previews show `[Preview truncated]` at byte or line limits.
+  The worker strips terminal control sequences and keeps no disk cache.
 
-These limits bound client transfer and display, **not Rex's internal formatting
-cost**: Rex may still format full scrollback before returning a bounded result.
-Actual UI responsiveness and preview cancellation need manual confirmation in
-the app; regression tests use fake terminal data and installed fzf.
+Previews do not switch sessions, send terminal input, or write history. The worker
+uses Rex CLI reads to bound response bytes, which native Lua RPC does not expose.
+A short-lived process-group guard checks owner liveness every 50 ms and terminates
+descendants after cancellation or owner exit. Cleanup may outlast the preview's
+Rex process.
+
+These are client-transfer and display limits. Rex may format full scrollback
+before returning a bounded result, so server-side formatting can still take time.
 
 ## History and limits
 
-The picker's first item uses the same remembered destination as the last-used
-toggle. If that target is missing/closed, history is missing/unreadable/ambiguous,
-or the optional host-status lookup fails, the list stays alphabetical. Opening
-the picker only reads an atomic history snapshot without locking or rewriting it.
-When nonempty history exists, ordering adds at most one host-status request with
-a 500 ms timeout; no ordering-status request is made without history. Switch-time
-validation is still strict: malformed history is never silently overwritten.
+History lives under the plugin root in `state/session-history.json`, alongside
+`state/session-history.lock`. Git ignores `/state/`; keep the checkout writable.
+Moving the checkout moves its history. Separate checkouts keep separate histories.
 
-`lua/navigation/sessions.lua` stores session IDs (not names) in
-`state/session-history.json` under the plugin root. Its lock lives alongside it as
-`state/session-history.lock`; `/state/` is ignored by Git. The checkout must be
-writable. Moving the plugin directory moves its history too, and separate checkouts
-have independent histories. History is separated by host and written atomically
-under a file lock. All apps using the same checkout and connected to the same host share
-one last-used pair, so restarting the app or changing its connection ID does not
-reset history. The current client ID is used only to address the connected app.
-Kernel locking uses the same lock file and automatically releases when the actual
-transaction worker exits. If its coordinator dies while the worker is still
-running, the lock remains held rather than admitting a concurrent writer.
-Renaming a session is safe. Writes use a private same-directory temporary file,
-file fsync, then atomic rename; malformed state is never silently repaired.
-
-New pairs are saved as the host's `shared` entry. Older per-client entries,
-including Python-created history, are retained. Before a shared entry exists,
-the toggle recovers an old pair only when it contains the invoking session and
-all eligible pairs agree on one still-existing destination. Conflicting histories
-require a picker selection rather than guessing which is newest. Recovery is
-saved only after a successful switch; no standalone migration is needed. Once a
-shared entry exists it is authoritative, even if its remembered session closes.
-
-Cancelling the picker or selecting the current session leaves history alone.
-If the remembered session was closed, or no history exists yet, the toggle
-reports an error; choose another session with a picker to establish a new pair.
-While a switch is in progress, another toggle reports a busy error instead of
-queuing a second operation with a potentially stale source session. Wait for
-the first switch to finish before toggling again.
+Apps using the same checkout share one last-used pair per host. The plugin tracks
+session IDs, so renaming a session or reconnecting an app does not reset the pair.
+Opening or cancelling a picker, or selecting the current session, leaves it alone.
 
 Rex does not expose a selected-session-change event. Sidebar clicks, the native
-session picker, and native next/previous actions do **not** update this history.
-After such a switch, the toggle returns to the most recently tracked session,
-then alternates with the session it was invoked from.
+session picker, and native next/previous actions do not update this history.
+After one of those switches, the toggle returns to the last tracked session and
+then alternates with the session you invoked it from. If a target has closed or
+you have no history yet, choose another session with either plugin picker.
 
-The helper operates on the local Rex server, matching the project picker;
-multiple server instances sharing one configuration directory are not supported.
-There is no persistent background process, and merely opening or cancelling either
-picker does not record a switch. Case-insensitive Unicode ordering uses macOS's
-locale-aware sort and can differ slightly from the old Node/ICU punctuation or
-accent ordering; equal labels use hidden full IDs as deterministic ties.
+The session picker's first item matches the toggle destination. Unusable history,
+a closed target, or a failed host-status lookup leaves the list in alphabetical
+order. Opening the picker reads a history snapshot without locking or writing it.
+Ordering adds at most one host-status request with a 500 ms timeout, and none
+without nonempty history. The plugin rejects malformed history at switch time
+rather than overwriting it. macOS's locale-aware sort determines name order.
+
+Concurrent toggles report a busy error; wait for the active switch to finish.
+The transaction worker holds the kernel lock until it exits, even if its
+coordinator dies. Writes use a private temporary file, file fsync, and atomic
+rename. Use one local Rex server per plugin checkout; sharing a checkout between
+server instances is unsupported.
+
+### Older history files
+
+The plugin preserves per-client entries and writes new pairs to the host's
+`shared` entry. Before that entry exists, it recovers a legacy pair only if it
+contains the invoking session and eligible pairs agree on one live destination.
+Conflicts require a picker selection. A successful switch saves the recovered
+pair; an existing `shared` entry takes precedence even if its target has closed.
 
 ## Project directories
 
-The `open_project_picker` action uses `lua/navigation/projects.lua`;
-the action receives the project settings from `setup()`.
-Roots accept absolute paths or `~/...`; their depth limits traversal.
-Hidden directories, excluded directory names, files, and directory symlinks are
-not offered. Overlapping roots are canonicalized and deduplicated.
+The project picker reuses associations in `$XDG_STATE_HOME/rex/project-sessions.json`,
+defaulting to `~/.local/state/rex/project-sessions.json`. Existing associations need
+no conversion. With a missing or stale association, it checks local terminal
+working directories before creating a session. Multiple matches require manual
+selection.
 
-The picker reuses the project/session associations in
-`$XDG_STATE_HOME/rex/project-sessions.json` (default `~/.local/state/rex`).
-Existing Python-created associations are read without conversion. If an association
-is stale or missing, local terminal working directories are checked before a new
-session is created; ambiguous matches require manual selection. Creation and
-registry updates are locked to avoid duplicate sessions during concurrent opens.
-Project opens wait up to 20 seconds for the registry lock rather than wait indefinitely.
-An association survives a refused switch, so retrying does not duplicate the session.
-Session matching explicitly attaches the worker's temporary Lua inspection stream,
-reads its layout/cwd metadata through native Lua, then detaches even if a read
-fails. It never changes the app's selected session. Generic
-`rex.call("session.view", ...)` without attachment would fail with a 409 conflict.
-Canonical cwd results are cached only for that one scan, not across project opens.
+Project creation and registry updates hold a lock to avoid duplicate sessions.
+Opens wait up to 20 seconds for that lock. An association survives a refused
+switch, so a retry can reuse the created session.
+
+During matching, the worker attaches a temporary inspection stream, reads layout
+and cwd metadata, and detaches even after a read error. Inspection does not change
+the app's selected session. The worker caches canonical cwd results for that scan.
+
+## Source layout
+
+```text
+init.lua          Public require("rex-navigator") entrypoint
+lua/navigation/   Actions, configuration, history, projects, previews, and adapters
+scripts/          Lua workers and shell adapters
+assets/           Logo and screenshots
+state/            Gitignored session history and lock
+tests/            Isolated tests and helpers
+tools/            Development tools, including the Unicode data generator
+```
+
+`navigation.sh` starts the Lua worker. `lock-transaction.sh` keeps the kernel lock
+in the writer process; `process-group.sh` cleans up subprocess groups on timeout
+or cancellation.
 
 ## Tests
 
@@ -338,29 +259,22 @@ From this repository root, run:
 node --test --test-concurrency=2 tests/*.test.mjs
 ```
 
-Node is a **development-only test runner**, not a production dependency. The suites
-run real Lua modules/workers inside Rex, isolated fake API/client responses, temporary
-project/state files, real kernel-lock contention, installed fzf, and private PTYs.
-The no-Node launcher suite uses shell/Lua fakes and poisons Node startup (including an
-absolute Node executable) to catch hidden runtime dependencies.
+For development, install Node.js, Rex, fzf, and a standalone `lua` for the offline
+action/install harnesses, plus the macOS tools listed above. No npm packages are
+required. Limit test-file concurrency to 2 to reduce process-start timing noise.
 
-Development prerequisites: Node.js with the built-in test runner, Rex, fzf, a
-standalone `lua` for the offline action/install harnesses, and the same macOS tools
-as production. No npm dependencies need installing. Test-file concurrency is
-limited because process-start timing assertions become noisy when many separate
-Rex runtimes are started simultaneously; all assertions still run.
+Start Rex before running the suite: `rex do` needs an initial server connection
+even with fake requests. The harness disables autostart, isolates state, and
+rejects live session/client operations. Tests use real Lua workers, kernel locks,
+fzf, and private PTYs. Launcher tests poison Node startup to catch production
+dependencies on Node.
 
-Embedded-Lua tests require an already-running Rex for its initial CLI connection;
-autostart is disabled and fake adapters forbid live session/client operations.
-Standalone Lua is used by the offline action/install harnesses only.
-Tests do not create, select, capture, or modify live sessions. Real-app appearance,
-remote-control permissions, and live interaction still need manual confirmation.
-
-`text-data.lua` is checked in. Its Unicode version is recorded in its header; the
-offline generator is `tools/generate-rex-unicode.mjs`. It is not run at startup.
+Check appearance, Remote Control permissions, and live preview responsiveness in
+the app; the isolated suite does not verify those. Regenerate the checked-in
+`text-data.lua` with `tools/generate-rex-unicode.mjs`; its header records the Unicode
+version. The plugin does not run the generator at startup.
 
 ## License
 
-Code and documentation are available under the [MIT license](LICENSE).
-The Rex logo in `assets/rex-logo.png` is a third-party asset from Superlogical and
-is not covered by this license.
+Use the code and documentation under the [MIT license](LICENSE). Superlogical
+owns the Rex logo in `assets/rex-logo.png`; this license does not cover that asset.
