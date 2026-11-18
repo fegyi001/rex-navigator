@@ -50,6 +50,18 @@ to switch, or **Esc** to cancel.
 
 ![Session picker showing the last-used session and a terminal preview](assets/session-picker.png)
 
+### Last-used session
+
+Use the `last_used_session` action to return to the last-used session without
+opening a picker. With the example keybindings below, press **Ctrl+A → Enter**.
+Press it again to switch back: after moving from session A to B through either
+picker, repeated toggles take you **B → A → B → A**.
+
+First switch to another session with the project picker or session picker to
+establish a history pair. Rex's sidebar and native session-switching actions do
+not update this history; see [History and limits](#history-and-limits) for details.
+You can bind this action to any Rex-supported shortcut or key sequence.
+
 ## Layout
 
 ```text
