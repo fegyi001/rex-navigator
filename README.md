@@ -25,7 +25,7 @@ Use `rex-navigator` to:
 - quickly switch back-and-forth your last-used session
 
 The pickers open in focused floating panes over your
-current tab. It uses Rex's embedded Lua and fzf; Node.js and standalone Lua are
+current tab. It uses Rex's embedded Lua and fzf; standalone Lua is
 not needed at runtime. See [Requirements](#requirements).
 
 **The action keybindings below are examples.** Choose your own Rex-supported keys
