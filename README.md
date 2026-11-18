@@ -8,8 +8,8 @@
 
 ## What is Rex?
 
-[Rex](https://www.superlogical.com/rex/docs) is a terminal multiplexer from
-[Superlogical](https://www.superlogical.com).
+[Rex](https://www.superlogical.com/rex/docs) is a terminal multiplexer from [Superlogical](https://www.superlogical.com) created by [Mitchell Hashimoto](https://mitchellh.com/), creator of [Ghostty](https://ghostty.org/)
+.
 
 You can customize Rex with Lua configuration, keybindings, and custom actions, or
 automate it through its CLI and server API. Rex is currently in beta; see the
